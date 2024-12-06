@@ -62,7 +62,6 @@ def main():
         help="Optional, submit your answer to Advent of Code.",
     )
     args = parser.parse_args()
-    logger.debug(args)
 
     if not 0 < args.day < 26:
         logger.info("Day number must be between 1 and 25")
