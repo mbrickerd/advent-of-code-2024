@@ -1,0 +1,15 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+.pytest_cache
+*.py[cod]
+*$py.class
+
+# Environments
+.venv
+
+# AoC
+data/
+aoc_headers.json
+aoc_session
+
+*.DS_Store
