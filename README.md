@@ -23,11 +23,15 @@ options:
   --submit                              Optional, submit your answer to AoC
 ```
 
-## Getting Started
+## Getting started
+
+
+
+## Solving puzzles
 
 Follow these steps to work on and solve a specific Advent of Code day using this project:
 
-1. Download Puzzle Input Data
+#### 1. Download Puzzle Input Data
 To download the puzzle input data for a specific day:
 
 ```bash
@@ -36,7 +40,7 @@ python main.py --day [day_number] --add-test-input
 
 This will download the test input data for the specified day and create the corresponding `test_ZZ_input.txt` file in the `data/dayXX/` directory.
 
-2. Create a New Daily Solution File
+#### 2. Create a New Daily Solution File
 To scaffold a new Solution class for a specific day:
 
 ```bash
@@ -45,7 +49,7 @@ python main.py --day [day_number] --add
 
 This will create a new solution file in the `solutions/` directory (e.g., `solutions/dayXX.py`). Add your logic for `part1` and `part2` methods in the generated file.
 
-3. Test Your Solution
+#### 3. Test Your Solution
 To test a specific part of your solution (e.g., `part1` or `part2`):
 
 ```bash
@@ -54,7 +58,7 @@ python main.py --day [day_number] --part [part_number]
 
 This will load the corresponding test data file (e.g., `data/dayXX/test_ZZ_input.txt`) and execute the specified part method using the test input. Ensure your solution produces the expected output.
 
-4. Solve Using Full Puzzle Input
+#### 4. Solve Using Full Puzzle Input
 To run your solution on the full puzzle input after testing:
 
 ```bash
@@ -63,7 +67,7 @@ python main.py --day [day_number] --part [part_number] --skip-test
 
 This bypasses the test phase and directly runs the solution on the full input dataset (`data/dayXX/puzzle_input.txt`).
 
-5. Submit Your Answer
+#### 5. Submit Your Answer
 If you're confident in your solution and want to submit the result to Advent of Code:
 
 ```bash
@@ -73,7 +77,7 @@ python main.py --day [day_number] --part [part_number] --skip-test --submit
 This will submit your answer for the specified day and part directly to Advent of Code.
 
 
-
+## Testing
 
 For PyTests, when you are ready to check the results, you can create a test class:
 
