@@ -21,7 +21,7 @@ class SolutionBase:
         self._benchmark = benchmark
         self.benchmark_times = []
         self.data = (
-            Reader.get_puzzle_input(self.day, self.is_raw) 
+            Reader.get_puzzle_input(self.day, self.is_raw)
             if self.skip_test
             else Reader.get_test_input(self.day, self.is_raw, self.part_num)
         )

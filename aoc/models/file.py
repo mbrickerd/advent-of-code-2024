@@ -1,12 +1,12 @@
-from datetime import datetime
 import json
 import os
 import sys
 import urllib.parse
-from urllib.request import Request, urlopen
+from datetime import datetime
 from pathlib import Path
 from time import sleep
 from typing import Dict, Optional
+from urllib.request import Request, urlopen
 
 import requests
 from bs4 import BeautifulSoup
