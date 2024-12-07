@@ -1,6 +1,6 @@
 import datetime
-from importlib import import_module
 from argparse import ArgumentParser
+from importlib import import_module
 
 from loguru import logger
 
@@ -72,9 +72,7 @@ def main():
         File.add_day(args.day)
 
     elif args.add_test_input:
-        logger.info(
-            f"Adding test input file for day {args.day}"
-        )
+        logger.info(f"Adding test input file for day {args.day}")
         File.add_test_input(args.day, args.part)
 
     elif args.add_test_file:
