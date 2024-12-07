@@ -25,13 +25,53 @@ options:
 
 ## Getting started
 
+#### Clone the Repository:
 
+```
+https://github.com/mbrickerd/advent-of-code-2024
+```
+
+#### Install Dependencies:
+
+Poetry is a tool for dependency management and packaging in Python. It allows you to declare the libraries your project depends on and it will manage (install/update) them for you. Poetry offers a lockfile to ensure repeatable installs, and can build your project for distribution.
+
+For more information on how to install Poetry on your operating system, click [here](https://python-poetry.org/docs/#installation).
+
+Once you have Poetry installed, run the following command from the root directory of this project:
+
+```bash
+poetry install
+```
+
+This command will also create a `.venv` virtual environment within your local project structure. Be sure to activate your newly created virtual environment before beginning with development with the appropriate command:
+
+
+| Platform | Shell       | Command to activate virtual environment          |
+|----------|-------------|--------------------------------------------------|
+| POSIX    | bash/zsh    | `$ source <venv>/bin/activate`                   |
+|          | fish        | `$ source <venv>/bin/activate.fish`              |
+|          | csh/tcsh    | `$ source <venv>/bin/activate.csh`               |
+|          | PowerShell  | `$ <venv>/bin/Activate.ps1`                      |
+| Windows  | cmd.exe     | `C:\> <venv>\Scripts\activate.bat`               |
+|          | PowerShell  | `PS C:\> <venv>\Scripts\Activate.ps1`            |
+
+
+If you need to add additional packages or libraries as you develop, run the following command to update the `pyproject.toml`:
+
+```
+poetry add <package_name>
+```
+
+## Project structure
+
+TODO
 
 ## Solving puzzles
 
 Follow these steps to work on and solve a specific Advent of Code day using this project:
 
-#### 1. Create a new daily solution file and download puzzle input data
+#### Create a new daily solution file and download puzzle input data
+
 To scaffold a new Solution class for a specific day:
 
 ```bash
@@ -40,7 +80,8 @@ python main.py --day [day_number] --add
 
 This will create a new solution file in the `solutions/` directory (e.g., `solutions/dayXX.py`) and download the test input data for the specified day and create the corresponding `test_ZZ_input.txt` file in the `data/dayXX/` directory. Add your logic for `part1` and `part2` methods in the generated solution file.
 
-#### 3. Test your solution
+#### Test your solution
+
 To test a specific part of your solution (e.g., `part1` or `part2`):
 
 ```bash
@@ -49,7 +90,8 @@ python main.py --day [day_number] --part [part_number]
 
 This will load the corresponding test data file (e.g., `data/dayXX/test_ZZ_input.txt`) and execute the specified part method using the test input. Ensure your solution produces the expected output.
 
-#### 4. Solve using full puzzle input
+#### Solve using full puzzle input
+
 To run your solution on the full puzzle input after testing:
 
 ```bash
@@ -58,7 +100,8 @@ python main.py --day [day_number] --part [part_number] --skip-test
 
 This bypasses the test phase and directly runs the solution on the full input dataset (`data/dayXX/puzzle_input.txt`).
 
-#### 5. Submit your answer
+#### Submit your answer
+
 If you're confident in your solution and want to submit the result to Advent of Code:
 
 ```bash
