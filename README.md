@@ -41,7 +41,7 @@ If you need to add additional packages or libraries as you develop, run the foll
 poetry add <package_name>
 ```
 
-#### Advent of Code configuration
+## Advent of Code configuration
 
 To interact directly with the Advent of Code platform (e.g., for downloading inputs or submitting answers), this framework requires two configuration files: `aoc_headers.json` and `aoc_session`. These files store essential metadata and session information necessary for authenticated requests.
 
