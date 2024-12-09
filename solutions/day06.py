@@ -16,7 +16,7 @@ class Solution(SolutionBase):
             if char in "^>v<"
         )
 
-    def get_next_pos(self, row: int, col: int, dir: str) -> Tuple[int, int]:
+    def get_next_position(self, row: int, col: int, dir: str) -> Tuple[int, int]:
         dr, dc = self.moves[dir]
         return row + dr, col + dc
 
@@ -29,7 +29,7 @@ class Solution(SolutionBase):
         path = {(row, col)}
 
         while True:
-            nr, nc = self.get_next_pos(row, col, dir)
+            nr, nc = self.get_next_position(row, col, dir)
             if not self.is_valid(nr, nc, grid):
                 return len(path) if not find_loops else False
 
