@@ -117,10 +117,10 @@ class Solution(SolutionBase):
         return sum(
             any(
                 (
-                    self.is_increasing(ls[:i] + ls[i + 1 :])
-                    or self.is_decreasing(ls[:i] + ls[i + 1 :])
+                    self.is_increasing(ls[:i] + ls[i + 1:])
+                    or self.is_decreasing(ls[:i] + ls[i + 1:])
                 )
-                and self.between_range(ls[:i] + ls[i + 1 :])
+                and self.between_range(ls[:i] + ls[i + 1:])
                 for i in range(len(ls))
             )
             or (

@@ -1,11 +1,10 @@
 import json
 import os
 import sys
-import urllib.parse
 from datetime import datetime
 from pathlib import Path
 from time import sleep
-from typing import Dict, Optional
+from typing import Dict
 from urllib.request import Request, urlopen
 
 import requests
@@ -203,7 +202,8 @@ class File:
 
             while now < available_to_download:
                 logger.info(
-                    "\033[Fnow:", now.strftime("%Y-%m-%d %H:%M:%S.%f")[:-3], "UTC"
+                    "\033[Fnow:", now.strftime(
+                        "%Y-%m-%d %H:%M:%S.%f")[:-3], "UTC"
                 )
                 sleep(1)
                 now = datetime.now()
@@ -254,7 +254,8 @@ class File:
 
             while now < available_to_download:
                 logger.info(
-                    "\033[Fnow:", now.strftime("%Y-%m-%d %H:%M:%S.%f")[:-3], "UTC"
+                    "\033[Fnow:", now.strftime(
+                        "%Y-%m-%d %H:%M:%S.%f")[:-3], "UTC"
                 )
                 sleep(1)
                 now = datetime.now()
@@ -289,7 +290,8 @@ class File:
         if not test_path.exists():
             sample_file = f"{path}/templates/tests/sample.txt"
             if not os.path.exists(sample_file):
-                raise FileNotFoundError(f"Template file not found: {sample_file}")
+                raise FileNotFoundError(
+                    f"Template file not found: {sample_file}")
 
             with open(sample_file, "r") as file:
                 content = file.read()

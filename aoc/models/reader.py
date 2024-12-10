@@ -15,7 +15,8 @@ class Reader:
             the `aoc` package location.
     """
 
-    PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__).rsplit("aoc", 1)[0])
+    PROJECT_ROOT = os.path.dirname(
+        os.path.abspath(__file__).rsplit("aoc", 1)[0])
 
     @staticmethod
     def get_path() -> str:

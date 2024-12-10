@@ -41,8 +41,10 @@ class Solution(SolutionBase):
                     "3,1,2"
                 Returns: ([(1,2), (2,3)], [[1,2,3], [3,1,2]])
         """
-        rules, ordering = [part.splitlines() for part in "\n".join(data).split("\n\n")]
-        rules = [(int(a), int(b)) for a, b in (rule.split("|") for rule in rules)]
+        rules, ordering = [part.splitlines()
+                           for part in "\n".join(data).split("\n\n")]
+        rules = [(int(a), int(b))
+                 for a, b in (rule.split("|") for rule in rules)]
         ordering = [[int(x) for x in line.split(",")] for line in ordering]
 
         return rules, ordering
