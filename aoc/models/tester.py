@@ -36,7 +36,7 @@ class TestSolutionUtility:
 
         Note:
             - Uses the `initialise()` function to dynamically load the solution class
-            - Loads test input from `data/dayXX/test_YY_input.txt`
+            - Loads test input from `tests/data/dayXX/test_YY_input.txt`
             - Expects solution classes to have `part1()` and `part2()` methods
 
         Example:
@@ -45,7 +45,7 @@ class TestSolutionUtility:
             # Raises AssertionError if result != 42
         """
         # Instantiate the solution object with the necessary parameters
-        solution = initialise(day)
+        solution = initialise(day, skip_test=False)
 
         # Dynamically select the part method based on `part_num`
         part_method = getattr(solution, f"part{part_num}")
