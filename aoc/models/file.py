@@ -213,10 +213,10 @@ class File:
             part_num (int): The puzzle part number (1 or 2).
 
         Note:
-            Creates file at: `data/dayXX/test_XX_input.txt`
+            Creates file at: `tests/data/dayXX/test_XX_input.txt`
         """
         path = File.get_path()
-        folder = os.path.realpath(f"{path}/data/day{day:02}")
+        folder = os.path.realpath(f"{path}/tests/data/day{day:02}")
         folder_path = Path(folder)
         if not folder_path.exists():
             folder_path.mkdir(parents=True, exist_ok=True)

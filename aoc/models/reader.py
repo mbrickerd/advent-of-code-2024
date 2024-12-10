@@ -62,9 +62,9 @@ class Reader:
             List[str]: List of test input lines, processed according to `is_raw` flag.
 
         Note:
-            Expects input file at: `data/dayXX/test_YY_input.txt`
+            Expects input file at: `tests/data/dayXX/test_YY_input.txt`
             where `XX` is the zero-padded day number and `YY` is the zero-padded part number.
         """
-        file_path = os.path.join(Reader.PROJECT_ROOT, f"data/day{day:02d}/test_{part_num:02d}_input.txt")
+        file_path = os.path.join(Reader.PROJECT_ROOT, f"tests/data/day{day:02d}/test_{part_num:02d}_input.txt")
         with open(file_path, "r") as file:
             return [line.strip("\n") if is_raw else line.strip() for line in file.readlines()]
