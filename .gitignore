@@ -8,7 +8,7 @@ __pycache__/
 .venv
 
 # AoC
-data/
+data/*
 aoc_headers.json
 aoc_session
 
