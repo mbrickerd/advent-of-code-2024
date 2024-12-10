@@ -20,7 +20,7 @@ install:
 	poetry install
 
 lint:
-	poetry run flake8 . --max-line-length=120 --exclude=.venv,.git,__pycache__
+	poetry run flake8 .
 
 format:
 	poetry run isort .

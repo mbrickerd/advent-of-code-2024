@@ -77,6 +77,9 @@ This repository is a modular and efficient framework designed to manage and solv
 
 ```hcl
 .
+├── .github
+│   └── workflows
+│       └── python-ci.yml
 ├── aoc
 │   ├── __init__.py
 │   ├── models
@@ -103,6 +106,7 @@ This repository is a modular and efficient framework designed to manage and solv
 │   └── test_02.py          # Tests for Day 2 solutions
 ├── .gitignore
 ├── main.py                 # Main script to manage tasks and run solutions
+├── Makefile
 ├── poetry.lock
 ├── pyproject.toml
 └── README.md
@@ -138,6 +142,21 @@ The central script to perform various tasks such as:
 - Running solutions and tests.
 - Benchmarking solution performance.
 - Submitting answers directly to the Advent of Code website.
+
+#### `Makefile`
+
+Provides convenient commands for common development tasks:
+- Installing dependencies
+- Running code quality checks (black, isort, flake8)
+- Executing tests
+- Formatting code
+
+#### `.github/workflows/python-ci.yml`
+
+GitHub Actions workflow configuration that automates:
+- Code quality checks on every push and pull request
+- Test execution after successful linting
+- Dependency caching for faster builds
 
 ## Usage
 
