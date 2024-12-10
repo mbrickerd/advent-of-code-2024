@@ -118,12 +118,8 @@ class Solution(SolutionBase):
         """
         blocks = self.parse_blocks(data[0])
 
-        space_idx = [
-            i for i, block in enumerate(blocks) if block.type == Block.TYPE_SPACE
-        ]
-        space_count = sum(
-            block.length for block in blocks if block.type == Block.TYPE_SPACE
-        )
+        space_idx = [i for i, block in enumerate(blocks) if block.type == Block.TYPE_SPACE]
+        space_count = sum(block.length for block in blocks if block.type == Block.TYPE_SPACE)
 
         current_block = []
         if space_idx:
@@ -134,11 +130,7 @@ class Solution(SolutionBase):
 
         while space_count and current_space_idx is not None:
             if len(current_block) == 0:
-                while (
-                    blocks
-                    and blocks[-1].type == Block.TYPE_SPACE
-                    and not blocks[-1].filled_files
-                ):
+                while blocks and blocks[-1].type == Block.TYPE_SPACE and not blocks[-1].filled_files:
                     blocks.pop()
                     if space_idx:
                         space_idx.pop()
@@ -156,10 +148,7 @@ class Solution(SolutionBase):
             blocks[current_space_idx].filled_files.append(item)
             space_count -= 1
 
-            if (
-                len(blocks[current_space_idx].filled_files)
-                == blocks[current_space_idx].length
-            ):
+            if len(blocks[current_space_idx].filled_files) == blocks[current_space_idx].length:
                 blocks[current_space_idx].type = Block.TYPE_FILE
                 blocks[current_space_idx].file_id = None
                 if space_idx:

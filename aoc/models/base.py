@@ -77,11 +77,7 @@ class SolutionBase:
         Args:
             _print (bool, optional): Whether to print the elapsed time. Defaults to `False`.
         """
-        if (
-            _print
-            and len(self.benchmark_times) > 0
-            and len(self.benchmark_times) % 2 == 0
-        ):
+        if _print and len(self.benchmark_times) > 0 and len(self.benchmark_times) % 2 == 0:
             t = self.benchmark_times[-1] - self.benchmark_times[-2]
             units = ["s", "ms", "µs", "ns"]
             unit_idx = 0

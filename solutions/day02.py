@@ -95,8 +95,7 @@ class Solution(SolutionBase):
             [
                 1
                 for ls in [list(map(int, line.split())) for line in data]
-                if (self.is_increasing(ls) or self.is_decreasing(ls))
-                and self.between_range(ls)
+                if (self.is_increasing(ls) or self.is_decreasing(ls)) and self.between_range(ls)
             ]
         )
 
@@ -116,16 +115,10 @@ class Solution(SolutionBase):
         """
         return sum(
             any(
-                (
-                    self.is_increasing(ls[:i] + ls[i + 1 :])
-                    or self.is_decreasing(ls[:i] + ls[i + 1 :])
-                )
+                (self.is_increasing(ls[:i] + ls[i + 1 :]) or self.is_decreasing(ls[:i] + ls[i + 1 :]))
                 and self.between_range(ls[:i] + ls[i + 1 :])
                 for i in range(len(ls))
             )
-            or (
-                (self.is_increasing(ls) or self.is_decreasing(ls))
-                and self.between_range(ls)
-            )
+            or ((self.is_increasing(ls) or self.is_decreasing(ls)) and self.between_range(ls))
             for ls in [list(map(int, line.split())) for line in data]
         )

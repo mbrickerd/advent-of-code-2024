@@ -26,11 +26,7 @@ class Submission:
             str: Absolute path to either the directory containing the script or
                  the script's directory if it is itself a directory.
         """
-        return (
-            path
-            if os.path.isdir(path := os.path.realpath(sys.argv[0]))
-            else os.path.dirname(path)
-        )
+        return path if os.path.isdir(path := os.path.realpath(sys.argv[0])) else os.path.dirname(path)
 
     @staticmethod
     def get_session() -> str:

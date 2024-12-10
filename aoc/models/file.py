@@ -30,11 +30,7 @@ class File:
             str: Absolute path to either the directory containing the script or
                 the script's directory if it is itself a directory.
         """
-        return (
-            path
-            if os.path.isdir(path := os.path.realpath(sys.argv[0]))
-            else os.path.dirname(path)
-        )
+        return path if os.path.isdir(path := os.path.realpath(sys.argv[0])) else os.path.dirname(path)
 
     @staticmethod
     def get_session() -> str:
@@ -137,11 +133,7 @@ class File:
         if response.status_code == 200:
             content = response.text
             soup = BeautifulSoup(content, "html.parser")
-            code_elements = [
-                element
-                for element in soup.find_all("code")
-                if element.text.count("\n") > 0
-            ]
+            code_elements = [element for element in soup.find_all("code") if element.text.count("\n") > 0]
             return code_elements[part_num - 1].text
 
         else:
@@ -189,9 +181,7 @@ class File:
 
         if file_path.stat().st_size == 0:
             now = datetime.now()
-            available_to_download = datetime(
-                int(path.split(os.sep)[-1].split("-")[-1]), 12, day, 5, 0, 0
-            )
+            available_to_download = datetime(int(path.split(os.sep)[-1].split("-")[-1]), 12, day, 5, 0, 0)
 
             if now < available_to_download:
                 logger.info(
@@ -201,9 +191,7 @@ class File:
                 )
 
             while now < available_to_download:
-                logger.info(
-                    "\033[Fnow:", now.strftime("%Y-%m-%d %H:%M:%S.%f")[:-3], "UTC"
-                )
+                logger.info("\033[Fnow:", now.strftime("%Y-%m-%d %H:%M:%S.%f")[:-3], "UTC")
                 sleep(1)
                 now = datetime.now()
 
@@ -240,9 +228,7 @@ class File:
 
         if file_path.stat().st_size == 0:
             now = datetime.now()
-            available_to_download = datetime(
-                int(path.split(os.sep)[-1].split("-")[-1]), 12, day, 5, 0, 0
-            )
+            available_to_download = datetime(int(path.split(os.sep)[-1].split("-")[-1]), 12, day, 5, 0, 0)
 
             if now < available_to_download:
                 logger.info(
@@ -252,9 +238,7 @@ class File:
                 )
 
             while now < available_to_download:
-                logger.info(
-                    "\033[Fnow:", now.strftime("%Y-%m-%d %H:%M:%S.%f")[:-3], "UTC"
-                )
+                logger.info("\033[Fnow:", now.strftime("%Y-%m-%d %H:%M:%S.%f")[:-3], "UTC")
                 sleep(1)
                 now = datetime.now()
 

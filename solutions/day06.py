@@ -34,12 +34,7 @@ class Solution(SolutionBase):
             Tuple[int, int, str]: Row index, column index, and direction character
                 of the guard's start position.
         """
-        return next(
-            (i, j, char)
-            for i, row in enumerate(grid)
-            for j, char in enumerate(row)
-            if char in "^>v<"
-        )
+        return next((i, j, char) for i, row in enumerate(grid) for j, char in enumerate(row) if char in "^>v<")
 
     def get_next_position(self, row: int, col: int, dir: str) -> Tuple[int, int]:
         """Calculate next position based on current position and direction.

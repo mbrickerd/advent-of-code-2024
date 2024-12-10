@@ -86,9 +86,7 @@ def main():
         action="store_true",
         help="Optional, use raw input instead of stripped input.",
     )
-    parser.add_argument(
-        "--add", action="store_true", help="Optional, create daily file."
-    )
+    parser.add_argument("--add", action="store_true", help="Optional, create daily file.")
     parser.add_argument(
         "--add-test-input",
         action="store_true",
@@ -99,9 +97,7 @@ def main():
         action="store_true",
         help="Optional, create test files.",
     )
-    parser.add_argument(
-        "--skip-test", action="store_true", help="Optional, skipping tests."
-    )
+    parser.add_argument("--skip-test", action="store_true", help="Optional, skipping tests.")
     parser.add_argument(
         "--benchmark",
         action="store_true",
@@ -140,9 +136,7 @@ def main():
             args.day, args.part, args.raw, args.skip_test, args.benchmark
         )
         logger.info(
-            f"The test answer is {answer}\n"
-            if (answer := solution.solve(part_num=args.part)) is not None
-            else ""
+            f"The test answer is {answer}\n" if (answer := solution.solve(part_num=args.part)) is not None else ""
         )
         solution.benchmark(_print=True)
 
@@ -151,11 +145,7 @@ def main():
         solution = import_module(f"solutions.day{args.day:02d}").Solution(
             args.day, args.part, args.raw, args.skip_test, args.benchmark
         )
-        logger.info(
-            f"The answer is {answer}\n"
-            if (answer := solution.solve(part_num=args.part)) is not None
-            else ""
-        )
+        logger.info(f"The answer is {answer}\n" if (answer := solution.solve(part_num=args.part)) is not None else "")
         solution.benchmark(_print=True)
 
         if answer and args.submit is True:

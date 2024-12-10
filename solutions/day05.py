@@ -18,9 +18,7 @@ class Solution(SolutionBase):
     print job orderings according to sequencing rules.
     """
 
-    def parse_data(
-        self, data: List[str]
-    ) -> Tuple[List[Tuple[int, int]], List[List[int]]]:
+    def parse_data(self, data: List[str]) -> Tuple[List[Tuple[int, int]], List[List[int]]]:
         """Parse input into rules and print orders.
 
         Args:
@@ -62,9 +60,7 @@ class Solution(SolutionBase):
         """
         position = {num: i for i, num in enumerate(pages)}
         return all(
-            position[before] < position[after]
-            for before, after in rules
-            if before in position and after in position
+            position[before] < position[after] for before, after in rules if before in position and after in position
         )
 
     def fix_order(self, pages: List[int], rules: List[tuple]) -> List[int]:
@@ -103,11 +99,7 @@ class Solution(SolutionBase):
                 (orders that already satisfy all rules).
         """
         rules, ordering = self.parse_data(data)
-        return sum(
-            pages[len(pages) // 2]
-            for pages in ordering
-            if self.is_valid_order(pages, rules)
-        )
+        return sum(pages[len(pages) // 2] for pages in ordering if self.is_valid_order(pages, rules))
 
     def part2(self, data: List[str]) -> int:
         """Sum middle pages from fixed invalid print orders.
@@ -121,7 +113,5 @@ class Solution(SolutionBase):
         """
         rules, ordering = self.parse_data(data)
         return sum(
-            self.fix_order(pages, rules)[len(pages) // 2]
-            for pages in ordering
-            if not self.is_valid_order(pages, rules)
+            self.fix_order(pages, rules)[len(pages) // 2] for pages in ordering if not self.is_valid_order(pages, rules)
         )
