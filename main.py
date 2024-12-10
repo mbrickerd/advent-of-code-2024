@@ -9,6 +9,57 @@ from aoc.models.submission import Submission
 
 
 def main():
+    """
+    Command-line interface for running and managing Advent of Code solutions.
+
+    Provides functionality to:
+    - Run solutions for specific days/parts
+    - Create solution files and download inputs
+    - Run tests and benchmarks
+    - Submit answers to adventofcode.com
+
+    The CLI accepts various arguments to control execution:
+
+    Required arguments:
+        -d/--day: Day number (1-25), defaults to current day
+        -p/--part: Part number (1 or 2), defaults to 1
+
+    Optional flags:
+        --raw: Use raw input (preserve newlines)
+        --add: Create solution files for specified day
+        --add-test-input: Download test input for specified day/part
+        --add-test-file: Create test file for specified day
+        --skip-test: Skip running tests before solution
+        --benchmark: Enable performance timing
+        --submit: Submit answer to Advent of Code
+
+    Command Flow:
+    1. Validates day number is 1-25
+    2. If `--add` flags used:
+       - Creates necessary files/downloads inputs
+    3. If solving puzzle:
+       - Validates part number is 1 or 2
+       - Runs tests unless `--skip-test` used
+       - Executes solution and displays answer
+       - If `--submit`, sends answer to AoC
+
+    Exit codes:
+        0: Success
+        1: Invalid day/part number
+
+    Example usage:
+        # Run solution for current day, part 1:
+        $ python main.py
+
+        # Run day 5 part 2 with benchmarking:
+        $ python main.py -d 5 -p 2 --benchmark
+
+        # Create files for day 10:
+        $ python main.py -d 10 --add
+
+    Note:
+        Solution modules must be in `solutions/dayXX.py` where `XX` is zero-padded day number
+    """
     _today = datetime.date.today().day
 
     parser = ArgumentParser(description="Advent of Code solution runner")

@@ -14,8 +14,23 @@ from loguru import logger
 
 
 class File:
+    """
+    Utility class for managing Advent of Code file operations and puzzle input retrieval.
+
+    This class provides static methods for handling file paths, session management,
+    downloading puzzle/test inputs, and setting up solution files. It manages the
+    directory structure and timing for puzzle input availability.
+    """
+
     @staticmethod
     def get_path() -> str:
+        """
+        Get the absolute path to the project directory.
+
+        Returns:
+            str: Absolute path to either the directory containing the script or
+                the script's directory if it is itself a directory.
+        """
         return (
             path
             if os.path.isdir(path := os.path.realpath(sys.argv[0]))
@@ -24,6 +39,15 @@ class File:
 
     @staticmethod
     def get_session() -> str:
+        """
+        Retrieve the Advent of Code session token from a local file.
+
+        Returns:
+            str: The session token stripped of whitespace.
+
+        Note:
+            Expects a file named `aoc_session` in the project root directory.
+        """
         session = ""
         path = File.get_path()
         session_path = os.path.realpath(f"{path}/aoc_session")
@@ -35,6 +59,15 @@ class File:
 
     @staticmethod
     def get_headers() -> Dict[str, str]:
+        """
+        Load HTTP headers configuration from a JSON file.
+
+        Returns:
+            Dict[str, str]: Dictionary of HTTP headers for AoC API requests.
+
+        Note:
+            Expects a file named `aoc_headers.json` in the project root directory.
+        """
         headers = {}
         path = File.get_path()
         headers_config_path = os.path.realpath(f"{path}/aoc_headers.json")
@@ -46,6 +79,19 @@ class File:
 
     @staticmethod
     def download_puzzle_input(day: int) -> str:
+        """
+        Download the puzzle input for a specific day from Advent of Code.
+
+        Args:
+            day (int): The day number (1-25) of the puzzle.
+
+        Returns:
+            str: The puzzle input content.
+
+        Note:
+            Requires valid session token and headers configuration.
+            Year is determined from the project directory name.
+        """
         session = File.get_session()
         year = File.get_path().split(os.sep)[-1].split("-")[-1]
 
@@ -65,6 +111,20 @@ class File:
 
     @staticmethod
     def download_test_input(day: int, part_num: int) -> str | None:
+        """
+        Download test input from the puzzle description for a specific day and part.
+
+        Args:
+            day (int): The day number (1-25) of the puzzle.
+            part_num (int): The puzzle part number (1 or 2).
+
+        Returns:
+            str | None: The test input content if found, `None` if download fails.
+
+        Note:
+            Extracts test input from code blocks in the puzzle description.
+            Part number determines which code block to use.
+        """
         session = File.get_session()
         year = File.get_path().split(os.sep)[-1].split("-")[-1]
 
@@ -91,6 +151,20 @@ class File:
 
     @staticmethod
     def add_day(day: int) -> None:
+        """
+        Set up the file structure for a new puzzle day.
+
+        Creates solution file from template and downloads puzzle input when available.
+        Waits for puzzle unlock time (5:00 UTC) if necessary.
+
+        Args:
+            day (int): The day number (1-25) to set up.
+
+        Note:
+            Creates following structure:
+            - `solutions/dayXX.py` (from template)
+            - `data/dayXX/puzzle_input.txt`
+        """
         path = File.get_path()
         solution = os.path.realpath(f"{path}/solutions/day{day:02}.py")
         solution_path = Path(solution)
@@ -141,6 +215,19 @@ class File:
 
     @staticmethod
     def add_test_input(day: int, part_num: int) -> None:
+        """
+        Set up and download test input for a specific puzzle part.
+
+        Creates test input file and downloads content when available.
+        Waits for puzzle unlock time (5:00 UTC) if necessary.
+
+        Args:
+            day (int): The day number (1-25) of the puzzle.
+            part_num (int): The puzzle part number (1 or 2).
+
+        Note:
+            Creates file at: `data/dayXX/test_XX_input.txt`
+        """
         path = File.get_path()
         folder = os.path.realpath(f"{path}/data/day{day:02}")
         folder_path = Path(folder)
@@ -179,6 +266,19 @@ class File:
 
     @staticmethod
     def add_test_file(day: int) -> None:
+        """
+        Create a test file for a specific puzzle day from template.
+
+        Args:
+            day (int): The day number (1-25) to create test file for.
+
+        Note:
+            Creates test file at: `tests/test_XX.py` using template from `templates/tests/sample.txt`
+            Replaces placeholders in template with actual day number.
+
+        Raises:
+            FileNotFoundError: If the template file is not found.
+        """
         path = File.get_path()
         test = os.path.realpath(f"{path}/tests/test_{day:02}.py")
 
@@ -197,7 +297,6 @@ class File:
             if content:
                 logger.info("Content loaded successfully")
 
-            # Replace placeholders with actual values
             content = content.format(day=day)
             with open(test, "w+") as f:
                 f.write(content)
