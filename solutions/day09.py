@@ -24,7 +24,7 @@ class Block:
     filled_files: List[int] = None  # Only used for space blocks
 
     def __post_init__(self) -> None:
-        """Initialize empty filled_files list if None."""
+        """Initialize empty filled_files list if `None`."""
         if self.filled_files is None:
             self.filled_files = []
 
