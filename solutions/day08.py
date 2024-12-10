@@ -149,7 +149,7 @@ class Solution(SolutionBase):
         for positions in antennas.values():
             # For each pair of same-frequency antennas
             for i, ant1 in enumerate(positions):
-                for ant2 in positions[i + 1:]:
+                for ant2 in positions[i + 1 :]:
                     # Find antinodes for this pair
                     antinodes = self.find_antinodes(ant1, ant2, data)
                     all_antinodes.update(antinodes)
@@ -181,7 +181,7 @@ class Solution(SolutionBase):
 
             # For each pair of same-frequency antennas
             for i, ant1 in enumerate(positions):
-                for j, ant2 in enumerate(positions[i + 1:], start=i + 1):
+                for j, ant2 in enumerate(positions[i + 1 :], start=i + 1):
                     # Add both antenna positions as they are collinear with at least two antennas
                     all_antinodes.add(ant1)
                     all_antinodes.add(ant2)

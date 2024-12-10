@@ -110,15 +110,13 @@ class Submission:
         values = {"level": level, "answer": answer}
         data = urllib.parse.urlencode(values).encode("utf-8")
 
-        req = urllib.request.Request(
-            url, method=method, headers=headers, data=data)
+        req = urllib.request.Request(url, method=method, headers=headers, data=data)
 
         with urllib.request.urlopen(req) as response:
             content = response.read().decode("utf-8")
 
         # Extract and format the response message
-        article = re.findall(r"<article>(.*?)</article>",
-                             content, re.DOTALL)[0]
+        article = re.findall(r"<article>(.*?)</article>", content, re.DOTALL)[0]
         article = "".join(article.split("</p>"))
         article = article.replace("\n", "")
         article = re.sub(r"<.*?>", "", article, re.DOTALL)

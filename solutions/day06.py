@@ -21,8 +21,7 @@ class Solution(SolutionBase):
     guard movement and analyze possible paths.
     """
 
-    moves = {"^": (-1, 0), ">": (0, 1), "v": (1, 0),
-             "<": (0, -1)}  # Direction vectors
+    moves = {"^": (-1, 0), ">": (0, 1), "v": (1, 0), "<": (0, -1)}  # Direction vectors
     turns = {"^": ">", ">": "v", "v": "<", "<": "^"}  # Right turn mappings
 
     def find_start(self, grid: List[List[str]]) -> Tuple[int, int, str]:
