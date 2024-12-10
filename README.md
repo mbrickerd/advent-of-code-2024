@@ -279,6 +279,10 @@ pytest tests/test_<day_number>.py
 
 This will output detailed results, showing which tests passed, failed, or encountered errors.
 
+## Acknowledgments
+
+This project structure was inspired by [nitekat1124's Advent of Code 2024 repository](https://github.com/nitekat1124/advent-of-code-2024).
+
 
 
 
