@@ -47,9 +47,22 @@ To interact directly with the Advent of Code platform (e.g., for downloading inp
 
 #### `aoc_headers.json`
 
-This file contains HTTP headers used for all requests made to the Advent of Code platform. These headers include metadata such as the User-Agent to identify the source of the request.
+This file contains HTTP headers used for all requests made to the Advent of Code platform. The most important header is the User-Agent, which helps identify your automated requests to the Advent of Code servers.
+
+The User-Agent should follow this format:
+- Project name and version
+- URL to your project/GitHub repository (optional)
+- Your contact information (email or GitHub username)
 
 Example content:
+
+```json
+{
+    "User-Agent": "AdventOfCodeHelper/1.0 (contact@example.com)"
+}
+```
+
+OR
 
 ```json
 {
@@ -62,6 +75,24 @@ This ensures requests conform to the platform's API requirements and helps ident
 #### `aoc_session`
 
 This file stores the session token obtained from the Advent of Code website after logging into your account. It is required for authentication and allows access to personalized inputs and submission capabilities.
+
+To obtain your session token:
+
+1. Log into [Advent of Code](https://adventofcode.com)
+
+2. Open your browser's Developer Tools:
+   - Chrome/Edge: Press F12 or Ctrl+Shift+I
+   - Firefox: Press F12 or Ctrl+Shift+I
+   - Safari: Enable 'Show Develop menu in menu bar' in Preferences > Advanced, then press Cmd+Option+I
+
+3. Navigate to:
+   - Chrome/Edge: Application > Cookies > https://adventofcode.com
+   - Firefox: Storage > Cookies
+   - Safari: Storage > Cookies
+
+4. Find the cookie named "session"
+
+5. Copy its value into the `aoc_session` file
 
 Example content:
 
