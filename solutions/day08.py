@@ -71,7 +71,9 @@ class Solution(SolutionBase):
         """
         return ((p1[0] - p2[0]) ** 2 + (p1[1] - p2[1]) ** 2) ** 0.5
 
-    def find_antinodes(self, ant1: Tuple[int, int], ant2: Tuple[int, int], data: List[str]) -> Set[Tuple[int, int]]:
+    def find_antinodes(
+        self, ant1: Tuple[int, int], ant2: Tuple[int, int], data: List[str]
+    ) -> Set[Tuple[int, int]]:
         """Find all antinodes created by a pair of antennas.
 
         For Part 1, antinodes occur at points where one antenna is twice as far

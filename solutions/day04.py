@@ -34,7 +34,9 @@ class Solution(SolutionBase):
         rows, cols = len(data), len(data[0])
         pattern = "MAS"
         return all(
-            0 <= row + i * dr < rows and 0 <= col + i * dc < cols and data[row + i * dr][col + i * dc] == pattern[i]
+            0 <= row + i * dr < rows
+            and 0 <= col + i * dc < cols
+            and data[row + i * dr][col + i * dc] == pattern[i]
             for i in range(3)
         )
 
@@ -69,7 +71,9 @@ class Solution(SolutionBase):
             for c in range(cols):
                 for dr, dc in directions:
                     if all(
-                        0 <= r + i * dr < rows and 0 <= c + i * dc < cols and data[r + i * dr][c + i * dc] == "XMAS"[i]
+                        0 <= r + i * dr < rows
+                        and 0 <= c + i * dc < cols
+                        and data[r + i * dr][c + i * dc] == "XMAS"[i]
                         for i in range(4)
                     ):
                         count += 1

@@ -130,7 +130,9 @@ class Solution(SolutionBase):
 
         while space_count and current_space_idx is not None:
             if len(current_block) == 0:
-                while blocks and blocks[-1].type == Block.TYPE_SPACE and not blocks[-1].filled_files:
+                while (
+                    blocks and blocks[-1].type == Block.TYPE_SPACE and not blocks[-1].filled_files
+                ):
                     blocks.pop()
                     if space_idx:
                         space_idx.pop()

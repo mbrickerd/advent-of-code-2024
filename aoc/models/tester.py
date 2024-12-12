@@ -57,4 +57,6 @@ class TestSolutionUtility:
         result = part_method(data=test_input)
 
         # Assert the result
-        assert result == expected, f"Test failed for Day {day}, Part {part_num}: Expected {expected}, got {result}."
+        assert (
+            result == expected
+        ), f"Test failed for Day {day}, Part {part_num}: Expected {expected}, got {result}."

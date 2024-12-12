@@ -136,7 +136,9 @@ def main():
             args.day, args.part, args.raw, args.skip_test, args.benchmark
         )
         logger.info(
-            f"The test answer is {answer}\n" if (answer := solution.solve(part_num=args.part)) is not None else ""
+            f"The test answer is {answer}\n"
+            if (answer := solution.solve(part_num=args.part)) is not None
+            else ""
         )
         solution.benchmark(_print=True)
 
@@ -145,7 +147,11 @@ def main():
         solution = import_module(f"solutions.day{args.day:02d}").Solution(
             args.day, args.part, args.raw, args.skip_test, args.benchmark
         )
-        logger.info(f"The answer is {answer}\n" if (answer := solution.solve(part_num=args.part)) is not None else "")
+        logger.info(
+            f"The answer is {answer}\n"
+            if (answer := solution.solve(part_num=args.part)) is not None
+            else ""
+        )
         solution.benchmark(_print=True)
 
         if answer and args.submit is True:

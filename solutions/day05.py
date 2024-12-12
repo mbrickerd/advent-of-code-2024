@@ -50,7 +50,8 @@ class Solution(SolutionBase):
 
         Args:
             pages (List[int]): List of page numbers in their print order
-            rules (List[Tuple[int, int]]): List of (before, after) pairs specifying required ordering
+            rules (List[Tuple[int, int]]): List of (before, after) pairs specifying
+                required ordering
 
         Returns:
             bool: `True` if all rules are satisfied (each 'before' page appears before its
@@ -60,7 +61,9 @@ class Solution(SolutionBase):
         """
         position = {num: i for i, num in enumerate(pages)}
         return all(
-            position[before] < position[after] for before, after in rules if before in position and after in position
+            position[before] < position[after]
+            for before, after in rules
+            if before in position and after in position
         )
 
     def fix_order(self, pages: List[int], rules: List[tuple]) -> List[int]:
@@ -99,7 +102,9 @@ class Solution(SolutionBase):
                 (orders that already satisfy all rules).
         """
         rules, ordering = self.parse_data(data)
-        return sum(pages[len(pages) // 2] for pages in ordering if self.is_valid_order(pages, rules))
+        return sum(
+            pages[len(pages) // 2] for pages in ordering if self.is_valid_order(pages, rules)
+        )
 
     def part2(self, data: List[str]) -> int:
         """Sum middle pages from fixed invalid print orders.
@@ -113,5 +118,7 @@ class Solution(SolutionBase):
         """
         rules, ordering = self.parse_data(data)
         return sum(
-            self.fix_order(pages, rules)[len(pages) // 2] for pages in ordering if not self.is_valid_order(pages, rules)
+            self.fix_order(pages, rules)[len(pages) // 2]
+            for pages in ordering
+            if not self.is_valid_order(pages, rules)
         )

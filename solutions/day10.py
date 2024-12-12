@@ -21,7 +21,9 @@ class Solution(SolutionBase):
     and calculate trailhead scores.
     """
 
-    def get_neighbors(self, grid: List[List[int]], x: int, y: int, target_height: int) -> List[Tuple[int, int]]:
+    def get_neighbors(
+        self, grid: List[List[int]], x: int, y: int, target_height: int
+    ) -> List[Tuple[int, int]]:
         """Find valid neighboring positions with a specific target height.
 
         Args:
@@ -38,12 +40,18 @@ class Solution(SolutionBase):
         neighbors = []
         for dx, dy in [(0, 1), (1, 0), (0, -1), (-1, 0)]:  # right, down, left, up
             new_x, new_y = x + dx, y + dy
-            if 0 <= new_x < len(grid) and 0 <= new_y < len(grid[0]) and grid[new_x][new_y] == target_height:
+            if (
+                0 <= new_x < len(grid)
+                and 0 <= new_y < len(grid[0])
+                and grid[new_x][new_y] == target_height
+            ):
                 neighbors.append((new_x, new_y))
 
         return neighbors
 
-    def find_paths_to_nine(self, grid: List[List[int]], start_x: int, start_y: int) -> Set[Tuple[int, int]]:
+    def find_paths_to_nine(
+        self, grid: List[List[int]], start_x: int, start_y: int
+    ) -> Set[Tuple[int, int]]:
         """Find all height-9 positions reachable via valid hiking trails from a starting position.
 
         A valid hiking trail must:

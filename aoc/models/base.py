@@ -38,8 +38,10 @@ class SolutionBase:
             day (int, optional): The day number of the puzzle (1-25). Defaults to -1.
             part_num (int, optional): Which part of the day's puzzle (1 or 2). Defaults to 1.
             is_raw (bool, optional): Whether to load input as raw text. Defaults to `False`.
-            skip_test (bool, optional): Whether to use puzzle input instead of test input. Defaults to `True`.
-            benchmark (bool, optional): Whether to measure solution execution time. Defaults to `False`.
+            skip_test (bool, optional): Whether to use puzzle input instead of test input.
+                Defaults to `True`.
+            benchmark (bool, optional): Whether to measure solution execution time.
+                Defaults to `False`.
         """
         self.day = day
         self.part_num = part_num
