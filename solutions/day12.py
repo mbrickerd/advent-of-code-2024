@@ -122,7 +122,7 @@ class Solution(SolutionBase):
 
         return len(edges)
 
-    def solve(self, data: List[str], calc_func: Callable) -> int:
+    def calculate_cost(self, data: List[str], calc_func: Callable) -> int:
         """Process the garden grid and calculate total fencing cost.
 
         For each unique plant type, identifies all connected regions and calculates
@@ -158,7 +158,7 @@ class Solution(SolutionBase):
         Returns:
             Total cost when each region's price is `area` * `perimeter`
         """
-        return self.solve(data, self.calculate_perimeter)
+        return self.calculate_cost(data, self.calculate_perimeter)
 
     def part2(self, data: List[str]) -> int:
         """Calculate total fencing cost using distinct sides-based pricing.
@@ -169,4 +169,4 @@ class Solution(SolutionBase):
         Returns:
             Total cost when each region's price is `area` * `number_of_sides`
         """
-        return self.solve(data, self.count_sides)
+        return self.calculate_cost(data, self.count_sides)
