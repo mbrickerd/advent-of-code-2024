@@ -100,7 +100,7 @@ class Solution(SolutionBase):
                     continue
 
                 new_y, new_x = y + dy, x + dx
-                
+
                 # Check if new position is valid
                 if (
                     0 <= new_y < len(grid)
