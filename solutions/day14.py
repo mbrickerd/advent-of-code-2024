@@ -43,10 +43,9 @@ class Solution(SolutionBase):
     Input format:
         List of strings where each line represents a robot with:
         - Initial position (p=x,y)
-        - Initial velocity (V=x,y)
-        Example: "p=0,4 v=3,-3"
+        - Initial velocity (v=x,y)
 
-    The solution uses custom Position and Robot namedtuples to track robot states
+    The solution uses custom `Position` and `Robot` namedtuples to track robot states
     and implements methods to calculate robot positions over time in a wrapping
     grid space.
     """
