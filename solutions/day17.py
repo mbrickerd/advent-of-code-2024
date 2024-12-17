@@ -48,16 +48,16 @@ class ThreeBitComputer:
         """
         if 0 <= operand <= 3:
             return operand
-
+        
         elif operand == 4:
             return self.registers["A"]
-
+        
         elif operand == 5:
             return self.registers["B"]
-
+        
         elif operand == 6:
             return self.registers["C"]
-
+        
         else:
             raise ValueError(f"Invalid combo operand: {operand}")
 
@@ -100,7 +100,7 @@ class ThreeBitComputer:
             if self.registers["A"] != 0:
                 self.instruction_pointer = operand
                 return True
-
+            
         elif opcode == 4:  # bxc
             self.registers["B"] ^= self.registers["C"]
 
@@ -116,32 +116,41 @@ class ThreeBitComputer:
         self.instruction_pointer += 2
         return True
 
-    def run(self, program: List[int]) -> str:
+    def run(self, program: List[int]) -> List[int]:
         """Run the entire program until completion.
 
         Args:
             program (List[int]): List of integers representing the program instructions
 
         Returns:
-            str: Comma-separated string of output values generated during execution
+            List[int]: List of output values generated during execution
         """
+        self.output = []  # Reset output before running
         while self.execute_instruction(program):
             pass
 
-        return ",".join(map(str, self.output))
+        return self.output
 
-    def check_output(self, program: List[int]) -> bool:
+    def check_output(self, program: List[int], partial: bool = False) -> bool:
         """Check if the program's output matches its own instructions.
 
         Args:
             program (List[int]): List of integers representing the program instructions
+            partial (bool, optional): If True, allow checking partial output matches.
+                Defaults to False.
 
         Returns:
-            bool: True if program output exactly matches the input program, False otherwise
+            bool: True if program output exactly matches the input program
+                (or matches partially if partial=True), False otherwise
         """
-        output_str = self.run(program)
-        output_numbers = [int(x) for x in output_str.split(",")]
-        return output_numbers == program
+        output = self.run(program)
+        if len(output) > len(program):
+            return False
+        
+        if partial:
+            return output == program[: len(output)]
+        
+        return output == program
 
 
 class Solution(SolutionBase):
@@ -194,10 +203,14 @@ class Solution(SolutionBase):
         """
         reg_a, reg_b, reg_c, program = self.parse_data(data)
         computer = ThreeBitComputer(reg_a, reg_b, reg_c)
-        return computer.run(program)
+        return ",".join(map(str, computer.run(program)))
 
     def part2(self, data: List[str]) -> int:
         """Find lowest positive value for register A that makes program output itself.
+
+        Uses mathematical patterns based on powers of 8 to efficiently find the solution.
+        Each digit in the output corresponds to a power of 8, allowing us to adjust the
+        input value A systematically rather than trying every possibility.
 
         Args:
             data (List[str]): Input lines containing register values and program
@@ -205,14 +218,27 @@ class Solution(SolutionBase):
         Returns:
             int: Lowest positive value for register A that causes program to output
                 a copy of its own instructions
+
+        Raises:
+            ValueError: If the program generates output longer than itself
         """
         _, reg_b, reg_c, program = self.parse_data(data)
 
-        # Start from 1 as we need lowest positive value
-        a = 1
+        # Calculate initial value based on program length and powers of 8
+        a = sum(7 * 8**i for i in range(len(program) - 1)) + 1
+
         while True:
             computer = ThreeBitComputer(a, reg_b, reg_c)
-            if computer.check_output(program):
+            output = computer.run(program)
+
+            if len(output) > len(program):
+                raise ValueError("Output longer than program")
+
+            if output == program:
                 return a
 
-            a += 1
+            # Find position of first mismatch and adjust A accordingly
+            for i in range(len(output) - 1, -1, -1):
+                if output[i] != program[i]:
+                    a += 8**i  # Adjust A by power of 8 at mismatch position
+                    break
