@@ -48,16 +48,16 @@ class ThreeBitComputer:
         """
         if 0 <= operand <= 3:
             return operand
-        
+
         elif operand == 4:
             return self.registers["A"]
-        
+
         elif operand == 5:
             return self.registers["B"]
-        
+
         elif operand == 6:
             return self.registers["C"]
-        
+
         else:
             raise ValueError(f"Invalid combo operand: {operand}")
 
@@ -100,7 +100,7 @@ class ThreeBitComputer:
             if self.registers["A"] != 0:
                 self.instruction_pointer = operand
                 return True
-            
+
         elif opcode == 4:  # bxc
             self.registers["B"] ^= self.registers["C"]
 
@@ -146,10 +146,10 @@ class ThreeBitComputer:
         output = self.run(program)
         if len(output) > len(program):
             return False
-        
+
         if partial:
             return output == program[: len(output)]
-        
+
         return output == program
 
 
