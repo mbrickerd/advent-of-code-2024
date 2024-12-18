@@ -141,7 +141,11 @@ class Solution(SolutionBase):
         )
 
     def can_move(
-        self, grid: List[List[str]], edges: List[Tuple[int, int]], dir_y: int, dir_x: int
+        self,
+        grid: List[List[str]],
+        edges: List[Tuple[int, int]],
+        dir_y: int,
+        dir_x: int,
     ) -> bool:
         """Check if boxes can be moved in the specified direction.
 
