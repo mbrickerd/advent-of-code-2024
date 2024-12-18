@@ -68,7 +68,8 @@ class Reader:
             where `XX` is the zero-padded day number and `YY` is the zero-padded part number.
         """
         file_path = os.path.join(
-            Reader.PROJECT_ROOT, f"tests/data/day{day:02d}/test_{part_num:02d}_input.txt"
+            Reader.PROJECT_ROOT,
+            f"tests/data/day{day:02d}/test_{part_num:02d}_input.txt",
         )
         with open(file_path, "r") as file:
             return [line.strip("\n") if is_raw else line.strip() for line in file.readlines()]
