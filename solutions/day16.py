@@ -108,11 +108,15 @@ class Solution(SolutionBase):
                     and grid[new_y][new_x] != "#"
                     and (new_y, new_x) not in history
                 ):
-
                     if new_dir == curr_dir:
                         # Moving forward
                         queue.append(
-                            ((new_y, new_x), history + [(new_y, new_x)], curr_score + 1, new_dir)
+                            (
+                                (new_y, new_x),
+                                history + [(new_y, new_x)],
+                                curr_score + 1,
+                                new_dir,
+                            )
                         )
                     else:
                         # Turning (stay in same position)
