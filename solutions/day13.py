@@ -99,7 +99,10 @@ class Solution(SolutionBase):
             prize_coords = self.extract(prize, "prize")
 
             if part2:
-                prize_coords = (prize_coords[0] + self.OFFSET, prize_coords[1] + self.OFFSET)
+                prize_coords = (
+                    prize_coords[0] + self.OFFSET,
+                    prize_coords[1] + self.OFFSET,
+                )
 
             if result := self.solve_machine(
                 btn_a_coords, btn_b_coords, prize_coords, None if part2 else 100
