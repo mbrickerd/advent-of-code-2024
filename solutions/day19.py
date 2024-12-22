@@ -111,26 +111,42 @@ class Solution(SolutionBase):
         return towels.split(", "), [row for row in seq.split("\n") if row]
 
     def part1(self, data: List[str]) -> int:
-        """Solve part 1: Count possible sequences.
+        """Count possible towel pattern sequences.
+
+        This method determines how many of the target sequences can be created using
+        the available towel patterns. A sequence is possible if it can be formed by
+        combining one or more of the available towel patterns in any order. The method
+        uses a TowelSorter helper class to analyze each sequence and count those that
+        are possible to create.
 
         Args:
-            data (List[str]): Input data lines
+            data (List[str]): Input data containing towel patterns and target sequences.
+                First line has comma-separated patterns, followed by a blank line, then
+                target sequences.
 
         Returns:
-            int: Number of sequences that can be created with available patterns
+            int: Number of sequences that can be created using the available towel patterns.
         """
         towels, seq = self.parse_data(data)
         towel_sorter = TowelSorter(towels, seq)
         return towel_sorter.part1()
 
     def part2(self, data: List[str]) -> int:
-        """Solve part 2: Count total possible arrangements.
+        """Sum all possible arrangement combinations across sequences.
+
+        This method calculates the total number of unique ways to arrange towels to match
+        each target sequence. For each sequence, it counts how many different combinations
+        of the available towel patterns can create that sequence. The final result is the
+        sum of possible arrangements across all sequences, using dynamic programming to
+        handle overlapping subproblems efficiently.
 
         Args:
-            data (List[str]): Input data lines
+            data (List[str]): Input data containing towel patterns and target sequences.
+                First line has comma-separated patterns, followed by a blank line, then
+                target sequences.
 
         Returns:
-            int: Sum of possible arrangements for all sequences
+            int: Total sum of possible arrangement combinations for all sequences.
         """
         towels, seq = self.parse_data(data)
         towel_sorter = TowelSorter(towels, seq)
