@@ -5,7 +5,7 @@ from aoc.models.base import SolutionBase
 
 
 class Solution(SolutionBase):
-    """Solution for Advent of Code 2023 - Day 20: Race Condition.
+    """Solution for Advent of Code 2024 - Day 20: Race Condition.
 
     This class solves a puzzle about finding shortcuts in a racetrack maze.
     Part 1 finds valid 2-move cheats, while Part 2 finds valid 20-move cheats.
