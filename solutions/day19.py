@@ -83,7 +83,7 @@ class TowelSorter:
 
 
 class Solution(SolutionBase):
-    """Solution for Advent of Code 2023 - Day 19: Linen Layout.
+    """Solution for Advent of Code 2024 - Day 19: Linen Layout.
 
     This class solves a puzzle about arranging towels with colored stripe patterns.
     Part 1 determines which sequences are possible to create, while Part 2 counts
