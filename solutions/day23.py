@@ -41,8 +41,12 @@ class Solution(SolutionBase):
         -------
             NetworkX Graph object representing the connection network
         """
-        graph = nx.Graph()
-        graph.add_edges_from(line.split("-") for line in data)
+        graph: nx.Graph = nx.Graph()
+        edges = []
+        for line in data:
+            source, target = line.split("-")
+            edges.append((source, target))
+        graph.add_edges_from(edges)
         return graph
 
     def part1(self, data: list[str]) -> int:
