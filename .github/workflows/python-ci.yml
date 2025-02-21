@@ -33,28 +33,37 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-uv-
 
-      - name: Create virtual environment
-        run: uv venv
+      - name: Create virtual environment and install dependencies
+        run: |
+          uv venv
+          # Install both main and dev dependencies
+          uv pip install -e .
+          uv pip install ruff==0.3.4 mypy>=1.13.0,<2 pytest>=8.3.4,<9 types-requests>=2.32.0,<3.0.0 types-beautifulsoup4>=4.12.0,<5.0.0
 
-      - name: Install dependencies
+      - name: Debug environment
         run: |
           source .venv/bin/activate
-          uv pip install -e '.[dependency-groups.dev]'
+          echo "Python version:"
+          python --version
+          echo "Installed packages:"
+          pip list
+          echo "Virtual env bin directory contents:"
+          ls -la .venv/bin/
 
       - name: Check formatting
         run: |
           source .venv/bin/activate
-          .venv/bin/ruff format --check .
+          python -m ruff format --check .
 
       - name: Run linting
         run: |
           source .venv/bin/activate
-          .venv/bin/ruff check .
+          python -m ruff check .
 
       - name: Run type checking
         run: |
           source .venv/bin/activate
-          .venv/bin/mypy .
+          python -m mypy .
 
   test:
     name: Tests
@@ -83,15 +92,14 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-uv-
 
-      - name: Create virtual environment
-        run: uv venv
-
-      - name: Install dependencies
+      - name: Create virtual environment and install dependencies
         run: |
-          source .venv/bin/activate
-          uv pip install -e '.[dependency-groups.dev]'
+          uv venv
+          # Install both main and dev dependencies
+          uv pip install -e .
+          uv pip install pytest>=8.3.4,<9
 
       - name: Run tests
         run: |
           source .venv/bin/activate
-          .venv/bin/pytest tests/
+          python -m pytest tests/
