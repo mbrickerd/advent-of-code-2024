@@ -33,17 +33,28 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-uv-
 
+      - name: Create virtual environment
+        run: uv venv
+
       - name: Install dependencies
-        run: uv pip install -e '.[dependency-groups.dev]'
+        run: |
+          source .venv/bin/activate
+          uv pip install -e '.[dependency-groups.dev]'
 
       - name: Check formatting
-        run: ruff format --check .
+        run: |
+          source .venv/bin/activate
+          ruff format --check .
 
       - name: Run linting
-        run: ruff check .
+        run: |
+          source .venv/bin/activate
+          ruff check .
 
       - name: Run type checking
-        run: mypy .
+        run: |
+          source .venv/bin/activate
+          mypy .
 
   test:
     name: Tests
@@ -72,8 +83,15 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-uv-
 
+      - name: Create virtual environment
+        run: uv venv
+
       - name: Install dependencies
-        run: uv pip install -e '.[dependency-groups.dev]'
+        run: |
+          source .venv/bin/activate
+          uv pip install -e '.[dependency-groups.dev]'
 
       - name: Run tests
-        run: pytest tests/
+        run: |
+          source .venv/bin/activate
+          pytest tests/
