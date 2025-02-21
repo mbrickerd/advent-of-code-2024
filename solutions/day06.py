@@ -1,144 +1,142 @@
-from copy import deepcopy
-from typing import List, Tuple
+"""Day 6: Guard Gallivant.
+
+This module provides the solution for Advent of Code 2024 - Day 6.
+It simulates a guard's movement through a grid following specific rules.
+
+The module tracks a guard that moves along a grid with walls, calculating path
+properties for Part 1 (path length) and Part 2 (counting loops created by adding walls).
+"""
+
+from typing import ClassVar, Literal, cast
 
 from aoc.models.base import SolutionBase
 
 
 class Solution(SolutionBase):
-    """Solution for Advent of Code 2024 - Day 6: Guard Gallivant.
+    """Guard movement simulation through a grid with walls.
 
-    This class simulates a guard's movement through a grid following specific rules.
-    The guard starts at a position with a direction (^>v<) and moves forward until
-    hitting a wall (#), which causes them to turn right. Part 1 calculates path length
-    until escape/loop, while Part 2 counts possible loops created by adding walls.
+    This solution implements guard movement algorithms:
+    - Part 1: Calculate path length until escape/loop
+    - Part 2: Count possible loops created by adding walls
 
     Grid elements:
         - "." : Empty space the guard can move through
         - "#" : Wall that causes the guard to turn right
         - ^>v< : Starting position and initial direction
-
-    This class inherits from `SolutionBase` and provides methods to simulate
-    guard movement and analyze possible paths.
     """
 
-    moves = {"^": (-1, 0), ">": (0, 1), "v": (1, 0), "<": (0, -1)}  # Direction vectors
-    turns = {"^": ">", ">": "v", "v": "<", "<": "^"}  # Right turn mappings
+    moves: ClassVar[dict[str, tuple[int, int]]] = {
+        "^": (-1, 0),
+        ">": (0, 1),
+        "v": (1, 0),
+        "<": (0, -1),
+    }
+    turns: ClassVar[dict[str, str]] = {"^": ">", ">": "v", "v": "<", "<": "^"}
 
-    def find_start(self, grid: List[List[str]]) -> Tuple[int, int, str]:
-        """Find guard's starting position and direction in the grid.
-
-        Args:
-            grid (List[List[str]]): 2D grid where each cell is ".", "#", or a direction
-
-        Returns:
-            Tuple[int, int, str]: Row index, column index, and direction character
-                of the guard's start position.
-        """
-        return next(
-            (i, j, char)
-            for i, row in enumerate(grid)
-            for j, char in enumerate(row)
-            if char in "^>v<"
-        )
-
-    def get_next_position(self, row: int, col: int, dir: str) -> Tuple[int, int]:
-        """Calculate next position based on current position and direction.
-
-        Args:
-            row (int): Current row index
-            col (int): Current column index
-            dir (str): Current direction ("^", ">", "v", or "<")
-
-        Returns:
-            Tuple[int, int]: Next row and column indices after moving one step
-                in the current direction.
-        """
-        dr, dc = self.moves[dir]
-        return row + dr, col + dc
-
-    def is_valid(self, row: int, col: int, grid: List[List[str]]) -> bool:
-        """Check if a position is within grid bounds.
-
-        Args:
-            row (int): Row index to check
-            col (int): Column index to check
-            grid (List[List[str]]): 2D grid
-
-        Returns:
-            bool: True if position is within grid bounds, False otherwise
-        """
-        return 0 <= row < len(grid) and 0 <= col < len(grid[0])
-
-    def simulate(self, grid: List[List[str]], find_loops: bool = False) -> int:
+    def simulate(
+        self, grid: list[list[str]], detect_loops: Literal[True] | None = None
+    ) -> int | bool:
         """Simulate guard's movement through the grid.
 
         Args:
-            grid (List[List[str]]): 2D grid representing the patrol area
-            find_loops (bool): If True, return whether path forms a loop instead
-                of path length
+            grid: 2D grid representing the patrol area
+            detect_loops: When True, return whether path forms a loop instead of
+                path length
 
-        Returns:
-            If find_loops is `False`:
-                int: Number of unique positions visited before escaping or looping
-            If find_loops is `True`:
-                bool: `True` if path forms a loop, `False` if guard escapes
+        Returns
+        -------
+            Number of unique positions visited (detect_loops=None)
+            Whether path forms a loop (detect_loops=True)
         """
-        row, col, dir = self.find_start(grid)
-        seen = {(row, col, dir)}  # Track visited positions with direction
-        path = {(row, col)}  # Track unique positions visited
+        # Find starting position
+        rows, cols = len(grid), len(grid[0])
+
+        # Fast starting position search
+        row, col, direction = -1, -1, ""
+        found = False
+        for i in range(rows):
+            for j in range(cols):
+                if grid[i][j] in "^>v<":
+                    row, col, direction = i, j, grid[i][j]
+                    found = True
+                    break
+
+            if found:
+                break
+
+        if not found:
+            error_message = "No starting position found in grid"
+            raise ValueError(error_message)
+
+        seen = {(row, col, direction)}
+        path = {(row, col)}
 
         while True:
-            nr, nc = self.get_next_position(row, col, dir)
-            if not self.is_valid(nr, nc, grid):
-                return len(path) if not find_loops else False
+            dr, dc = self.moves[direction]
+            nr, nc = row + dr, col + dc
 
+            # Check if guard escapes grid bounds
+            if not (0 <= nr < rows and 0 <= nc < cols):
+                return False if detect_loops is True else len(path)
+
+            # Handle wall collision (turn right)
             if grid[nr][nc] == "#":
-                dir = self.turns[dir]  # Turn right at wall
-                if (row, col, dir) in seen:
-                    return len(path) if not find_loops else True
+                direction = self.turns[direction]
+                state = (row, col, direction)
+                if state in seen:
+                    return True if detect_loops is True else len(path)
 
+            # Move forward
             else:
                 row, col = nr, nc
-                if (row, col, dir) in seen:
-                    return len(path) if not find_loops else True
+                state = (row, col, direction)
+                if state in seen:
+                    return True if detect_loops is True else len(path)
 
-            seen.add((row, col, dir))
+            seen.add(state)
             path.add((row, col))
 
-    def part1(self, data: List[str]) -> int:
+    def part1(self, data: list[str]) -> int:
         """Calculate number of positions visited before guard escapes or loops.
 
         Args:
-            data (List[str]): Input grid rows as strings
+            data: Input grid rows as strings
 
-        Returns:
-            int: Number of unique positions the guard visits before either
-                escaping the grid or entering a loop.
+        Returns
+        -------
+            Number of unique positions visited before escaping or looping
         """
-        return self.simulate([list(row) for row in data])
+        grid = [list(row) for row in data]
+        return cast(int, self.simulate(grid))
 
-    def part2(self, data: List[str]) -> int:
+    def part2(self, data: list[str]) -> int:
         """Count how many possible wall placements create loops.
 
         Tests placing a wall at each empty position (except start) and counts
-        how many of these modifications cause the guard's path to loop.
+        how many modifications cause the guard's path to loop.
 
         Args:
-            data (List[str]): Input grid rows as strings
+            data: Input grid rows as strings
 
-        Returns:
-            int: Number of possible wall placements that result in the guard's
-                path forming a loop.
+        Returns
+        -------
+            Number of possible wall placements creating loops
         """
         grid = [list(row) for row in data]
-        row, col, _ = self.find_start(grid)
-        loops = 0
+        rows, cols = len(grid), len(grid[0])
 
-        for i in range(len(grid)):
-            for j in range(len(grid[0])):
-                if grid[i][j] == "." and (i, j) != (row, col):
-                    test_grid = deepcopy(grid)
-                    test_grid[i][j] = "#"
-                    loops += self.simulate(test_grid, True)
+        # Find starting position
+        start_positions = [(i, j) for i in range(rows) for j in range(cols) if grid[i][j] in "^>v<"]
+        start_row, start_col = start_positions[0]
+
+        loops = 0
+        for i in range(rows):
+            for j in range(cols):
+                if grid[i][j] == "." and (i, j) != (start_row, start_col):
+                    grid[i][j] = "#"
+                    if self.simulate(grid, detect_loops=True) is True:
+                        loops += 1
+
+                    grid[i][j] = "."
 
         return loops

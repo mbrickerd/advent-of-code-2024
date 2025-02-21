@@ -1,5 +1,12 @@
+"""Day 23: LAN Party.
+
+Analyze player connections and find gaming groups in a network.
+
+This module solves a puzzle about identifying gaming configurations
+based on network connections and group composition rules.
+"""
+
 from itertools import combinations
-from typing import List
 
 import networkx as nx
 
@@ -19,12 +26,9 @@ class Solution(SolutionBase):
         - Node IDs starting with 't' represent teachers
         - All other nodes represent students
         - Connections indicate which players can directly play together
-
-    This class inherits from `SolutionBase` and uses NetworkX to analyze the
-    connection graph and find valid gaming groups of different sizes.
     """
 
-    def construct_graph(self, data: List[str]) -> nx.Graph:
+    def construct_graph(self, data: list[str]) -> nx.Graph:
         """Construct a NetworkX graph from the input connection data.
 
         Creates an undirected graph where nodes represent players and edges
@@ -33,17 +37,15 @@ class Solution(SolutionBase):
         Args:
             data: List of strings, each containing two node IDs separated by a hyphen
 
-        Returns:
+        Returns
+        -------
             NetworkX Graph object representing the connection network
         """
-        G = nx.Graph()
-        for line in data:
-            parts = line.split("-")
-            G.add_edge(parts[0], parts[1])
+        graph = nx.Graph()
+        graph.add_edges_from(line.split("-") for line in data)
+        return graph
 
-        return G
-
-    def part1(self, data: List[str]) -> int:
+    def part1(self, data: list[str]) -> int:
         """Count valid gaming trios that include at least one teacher.
 
         Analyzes the connection graph to find all possible groups of three
@@ -55,25 +57,27 @@ class Solution(SolutionBase):
         Args:
             data: List of strings representing player connections
 
-        Returns:
+        Returns
+        -------
             Number of unique valid gaming trios
         """
-        G = self.construct_graph(data)
-        cliques = [
+        graph = self.construct_graph(data)
+        teacher_cliques = [
             clique
-            for clique in nx.find_cliques(G)
-            if len(clique) >= 3 and any(node[0] == "t" for node in clique)
+            for clique in nx.find_cliques(graph)
+            if len(clique) >= 3 and any(node.startswith("t") for node in clique)
         ]
-        sets = set()
 
-        for clique in cliques:
-            for nodes in combinations(clique, 3):
-                if any(node[0] == "t" for node in nodes):
-                    sets.add(tuple(sorted(nodes)))
+        return len(
+            {
+                tuple(sorted(nodes))
+                for clique in teacher_cliques
+                for nodes in combinations(clique, 3)
+                if any(node.startswith("t") for node in nodes)
+            }
+        )
 
-        return len(sets)
-
-    def part2(self, data: List[str]) -> int:
+    def part2(self, data: list[str]) -> str:
         """Find the largest possible gaming group.
 
         Identifies the maximum clique in the connection graph, representing
@@ -83,12 +87,11 @@ class Solution(SolutionBase):
         Args:
             data: List of strings representing player connections
 
-        Returns:
+        Returns
+        -------
             Comma-separated string of player IDs in the largest gaming group,
             sorted alphabetically
         """
-        G = self.construct_graph(data)
-        cliques = nx.find_cliques(G)
-        LAN = sorted(sorted(cliques, key=len, reverse=True)[0])
-
-        return ",".join(LAN)
+        graph = self.construct_graph(data)
+        largest_clique = max(nx.find_cliques(graph), key=len)
+        return ",".join(sorted(largest_clique))

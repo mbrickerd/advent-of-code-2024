@@ -2,17 +2,16 @@ from aoc.models.tester import TestSolutionUtility
 
 def test_day{day:02d}_part1():
     TestSolutionUtility.run_test(
-        day={day}, 
-        is_raw=False, 
-        part_num=1, 
+        day={day},
+        is_raw=False,
+        part_num=1,
         expected=9999999999999,
     )
 
 def test_day{day:02d}_part2():
     TestSolutionUtility.run_test(
-        day={day}, 
-        is_raw=False,  
-        part_num=2, 
+        day={day},
+        is_raw=False,
+        part_num=2,
         expected=9999999999999,
     )
-

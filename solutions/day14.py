@@ -1,19 +1,30 @@
-from typing import List, NamedTuple, Set, Tuple
+"""Day 14: Restroom Redoubt.
+
+This module provides the solution for Advent of Code 2024 - Day 14.
+It simulates robots moving in a wrapping grid space with specific velocities,
+tracking their positions over time to solve spatial puzzles.
+
+Each robot has an initial position and velocity, and moves in a grid where
+going beyond boundaries causes wrapping to the opposite side. The solution
+tracks collisions and quadrant distributions of robots.
+
+The module contains a Solution class that inherits from SolutionBase and implements
+methods to parse robot configurations, calculate positions over time, and solve
+various spatial puzzles.
+"""
+
+from typing import NamedTuple
 
 from aoc.models.base import SolutionBase
 
 
 class Position(NamedTuple):
-    """Find first time when robots collide.
+    """Represents a 2D coordinate position.
 
-    Simulates robot movement until two or more robots occupy the same position,
-    indicating a collision.
-
-    Args:
-        data: List of strings containing robot configurations
-
-    Returns:
-        Time step when the first collision occurs
+    Attributes
+    ----------
+        x: X-coordinate in the grid
+        y: Y-coordinate in the grid
     """
 
     x: int
@@ -23,9 +34,10 @@ class Position(NamedTuple):
 class Robot(NamedTuple):
     """Represents a robot with its current position and velocity.
 
-    Attributes:
-        pos: Position namedtuple containing the robot's current (x, y) coordinates
-        velocity: Position namedtuple containing the robot's (dx, dy) velocity components
+    Attributes
+    ----------
+        pos: Position containing the robot's current (x, y) coordinates
+        velocity: Position containing the robot's (dx, dy) velocity components
     """
 
     pos: Position
@@ -37,38 +49,33 @@ class Solution(SolutionBase):
 
     This class solves a puzzle involving robots moving in a confined grid space,
     where each robot has an initial position and velocity. The robots move in a
-    wrapping grid pattern, and their positions must be tracked over time to solve
-    various spatial puzzles.
+    wrapping grid pattern, and their positions must be tracked over time.
 
     Input format:
         List of strings where each line represents a robot with:
         - Initial position (p=x,y)
         - Initial velocity (v=x,y)
-
-    The solution uses custom `Position` and `Robot` namedtuples to track robot states
-    and implements methods to calculate robot positions over time in a wrapping
-    grid space.
     """
 
-    def parse_data(self, data: List[str]) -> List[Robot]:
+    def parse_data(self, data: list[str]) -> list[Robot]:
         """Parse input data into a list of Robot objects.
 
         Args:
             data: List of strings containing robot position and velocity data
 
-        Returns:
+        Returns
+        -------
             List of Robot objects with initial positions and velocities
         """
         robots = []
         for line in data:
             pos_str, vel_str = line.split(" ")
             x, y = map(int, pos_str[2:].split(","))
-            velocity_x, velocity_y = map(int, vel_str[2:].split(","))
-            robots.append(Robot(Position(x, y), Position(velocity_x, velocity_y)))
-
+            dx, dy = map(int, vel_str[2:].split(","))
+            robots.append(Robot(Position(x, y), Position(dx, dy)))
         return robots
 
-    def get_grid_size(self, robots: List[Robot]) -> Tuple[int, int]:
+    def get_grid_size(self, robots: list[Robot]) -> tuple[int, int]:
         """Determine the size of the grid based on number of robots.
 
         Different grid sizes are used for the sample input (12 robots)
@@ -77,10 +84,11 @@ class Solution(SolutionBase):
         Args:
             robots: List of Robot objects
 
-        Returns:
+        Returns
+        -------
             Tuple of (width, height) representing grid dimensions
         """
-        return (101, 103) if len(robots) != 12 else (11, 7)
+        return (11, 7) if len(robots) == 12 else (101, 103)
 
     def get_position_at_time(self, robot: Robot, time: int, width: int, height: int) -> Position:
         """Calculate a robot's position after a given amount of time.
@@ -94,14 +102,15 @@ class Solution(SolutionBase):
             width: Grid width
             height: Grid height
 
-        Returns:
+        Returns
+        -------
             Position representing robot's location after specified time
         """
-        x = (robot.pos.x + time * (robot.velocity.x + width)) % width
-        y = (robot.pos.y + time * (robot.velocity.y + height)) % height
+        x = (robot.pos.x + time * robot.velocity.x) % width
+        y = (robot.pos.y + time * robot.velocity.y) % height
         return Position(x, y)
 
-    def part1(self, data: List[str]) -> int:
+    def part1(self, data: list[str]) -> int:
         """Calculate product of robots in each quadrant after 100 time steps.
 
         Divides the grid into four quadrants and counts robots in each,
@@ -110,26 +119,26 @@ class Solution(SolutionBase):
         Args:
             data: List of strings containing robot configurations
 
-        Returns:
+        Returns
+        -------
             Product of robot counts in each quadrant
         """
         robots = self.parse_data(data)
         width, height = self.get_grid_size(robots)
+        mid_x, mid_y = width // 2, height // 2
 
         quads = [0] * 4
-
         for robot in robots:
-            position = self.get_position_at_time(robot, 100, width, height)
-
-            if position.x == width // 2 or position.y == height // 2:
+            pos = self.get_position_at_time(robot, 100, width, height)
+            if pos.x == mid_x or pos.y == mid_y:
                 continue
 
-            quad_idx = (int(position.x > width // 2)) + (int(position.y > height // 2) * 2)
+            quad_idx = (int(pos.x > mid_x)) + (int(pos.y > mid_y) * 2)
             quads[quad_idx] += 1
 
         return quads[0] * quads[1] * quads[2] * quads[3]
 
-    def part2(self, data: List[str]) -> int:
+    def part2(self, data: list[str]) -> int:
         """Find first time when robots collide.
 
         Simulates robot movement until two or more robots occupy the same position,
@@ -138,23 +147,20 @@ class Solution(SolutionBase):
         Args:
             data: List of strings containing robot configurations
 
-        Returns:
+        Returns
+        -------
             Time step when the first collision occurs
         """
         robots = self.parse_data(data)
         width, height = self.get_grid_size(robots)
 
-        time = 0
-        while True:
-            time += 1
-            position: Set[Position] = set()
-
+        for time in range(1, 10000):
+            positions = set()
             for robot in robots:
-                new_pos = self.get_position_at_time(robot, time, width, height)
-                if new_pos in position:
-                    break
+                pos = self.get_position_at_time(robot, time, width, height)
+                if pos in positions:
+                    return time
 
-                position.add(new_pos)
+                positions.add(pos)
 
-            else:  # no breaks occurred - valid solution found
-                return time
+        return -1

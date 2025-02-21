@@ -1,64 +1,41 @@
-import datetime
+"""Advent of Code CLI Runner.
+
+This module provides a command-line interface for running and managing Advent of Code
+solutions. It handles running solutions, creating template files, downloading inputs,
+running tests, benchmarking performance, and submitting answers to adventofcode.com.
+
+The CLI supports various arguments to control execution. Users can specify which day
+and part to run, customize how inputs are handled, create necessary solution files,
+control test execution and performance benchmarking, and submit answers directly to
+the Advent of Code website.
+"""
+
 from argparse import ArgumentParser
-from importlib import import_module
+import datetime
 
 from loguru import logger
 
 from aoc.models.file import File
 from aoc.models.submission import Submission
+from aoc.utils.initalise import initialise
 
 
-def main():
-    """
-    Command-line interface for running and managing Advent of Code solutions.
+def main() -> None:
+    """Execute the Advent of Code CLI workflow.
 
-    Provides functionality to:
-    - Run solutions for specific days/parts
-    - Create solution files and download inputs
-    - Run tests and benchmarks
-    - Submit answers to adventofcode.com
-
-    The CLI accepts various arguments to control execution:
-
-    Required arguments:
-        -d/--day: Day number (1-25), defaults to current day
-        -p/--part: Part number (1 or 2), defaults to 1
-
-    Optional flags:
-        --raw: Use raw input (preserve newlines)
-        --add: Create solution files for specified day
-        --add-test-input: Download test input for specified day/part
-        --add-test-file: Create test file for specified day
-        --skip-test: Skip running tests before solution
-        --benchmark: Enable performance timing
-        --submit: Submit answer to Advent of Code
-
-    Command Flow:
+    Parses command-line arguments and performs the requested operation:
     1. Validates day number is 1-25
-    2. If `--add` flags used:
-       - Creates necessary files/downloads inputs
+    2. If creation flags used:
+       - Creates solution files, test files, or downloads inputs
     3. If solving puzzle:
        - Validates part number is 1 or 2
-       - Runs tests unless `--skip-test` used
+       - Runs tests unless skipped
        - Executes solution and displays answer
-       - If `--submit`, sends answer to AoC
+       - Submits answer if requested
 
     Exit codes:
         0: Success
-        1: Invalid day/part number
-
-    Example usage:
-        # Run solution for current day, part 1:
-        $ python main.py
-
-        # Run day 5 part 2 with benchmarking:
-        $ python main.py -d 5 -p 2 --benchmark
-
-        # Create files for day 10:
-        $ python main.py -d 10 --add
-
-    Note:
-        Solution modules must be in `solutions/dayXX.py` where `XX` is zero-padded day number
+        1: Invalid day/part number (implicit through exit())
     """
     _today = datetime.date.today().day
 
@@ -132,8 +109,8 @@ def main():
 
     elif not args.skip_test:
         logger.info(f"Testing day {args.day} part {args.part}\n")
-        solution = import_module(f"solutions.day{args.day:02d}").Solution(
-            args.day, args.part, args.raw, args.skip_test, args.benchmark
+        solution = initialise(
+            args.day, args.part, raw=args.raw, skip_test=args.skip_test, benchmark=args.benchmark
         )
         logger.info(
             f"The test answer is {answer}\n"
@@ -144,8 +121,8 @@ def main():
 
     else:
         logger.info(f"Solving day {args.day} part {args.part}\n")
-        solution = import_module(f"solutions.day{args.day:02d}").Solution(
-            args.day, args.part, args.raw, args.skip_test, args.benchmark
+        solution = initialise(
+            args.day, args.part, raw=args.raw, skip_test=args.skip_test, benchmark=args.benchmark
         )
         logger.info(
             f"The answer is {answer}\n"

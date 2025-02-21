@@ -1,48 +1,125 @@
-[tool.poetry]
+[project]
 name = "aoc2024"
 version = "0.1.0"
 description = "Advent of Code is an Advent calendar of small programming puzzles for a variety of skill sets and skill levels that can be solved in any programming language you like. People use them as interview prep, company training, university coursework, practice problems, a speed contest, or to challenge each other."
-authors = ["mallory.brickerd <mallory.brickerd@eraneos.com>"]
+authors = [{ name = "mallory.brickerd", email = "mallorybrickerd@gmail.com" }]
+requires-python = "<4.0,>=3.11"
 readme = "README.md"
-packages = [{include = "aoc"}]
+dependencies = [
+    "loguru<1.0.0,>=0.7.3",
+    "requests<3.0.0,>=2.32.3",
+    "bs4<1.0.0,>=0.0.2",
+    "networkx<4.0.0,>=3.4.2",
+    "pre-commit>=4.1.0",
+]
 
-[tool.poetry.dependencies]
-python = "^3.11"
-loguru = "^0.7.3"
-requests = "^2.32.3"
-bs4 = "^0.0.2"
-networkx = "^3.4.2"
+[dependency-groups]
+dev = [
+    "ruff==0.3.4",
+    "mypy>=1.13.0,<2",
+    "types-requests>=2.32.0,<3.0.0",
+    "types-beautifulsoup4>=4.12.0,<5.0.0",
+    "pytest>=8.3.4,<9",
+]
 
+[tool.hatch.build.targets.sdist]
+include = ["aoc"]
 
-[tool.poetry.group.dev.dependencies]
-black = "^24.10.0"
-isort = "^5.13.2"
-flake8 = "^7.1.1"
-autopep8 = "^2.3.1"
-mypy = "^1.13.0"
-pytest = "^8.3.4"
-flake8-pyproject = "^1.2.3"
+[tool.hatch.build.targets.wheel]
+include = ["aoc"]
 
-[tool.black]
+[tool.ruff]
 line-length = 100
-target-version = ["py311"]
-include = '\.pyi?$'
+target-version = "py311"
+include = ["*.py", "*.pyi", "**/pyproject.toml"]
+exclude = [
+    ".venv",
+    ".git",
+    "__pycache__",
+]
 
-[tool.isort]
-profile = "black"
-line_length = 100
-multi_line_output = 3
+[tool.ruff.lint]
+select = [
+    "E",     # pycodestyle errors
+    "F",     # pyflakes
+    "UP",    # pyupgrade
+    "D",     # pydocstyle
+    "I",     # isort
+    "N",     # naming
+    "S",     # bandit
+    "BLE",   # blind-except
+    "FBT",   # boolean-trap
+    "B",     # bugbear
+    "A",     # builtins
+    "C4",    # comprehensions
+    "EM",    # errmsg
+    "FA",    # future-annotations
+    "ISC",   # implicit-str-concat
+    "ICN",   # import-conventions
+    "T20",   # print
+    "PT",    # pytest-style
+    "RET",   # return
+    "SIM",   # simplify
+    "PTH",   # pathlib
+    "ERA",   # eradicate
+    "PGH",   # pygrep-hooks
+    "NPY",   # numpy-style
+    "PERF",  # performance
+    "RUF",   # ruff-specific
+]
+fixable = ["ALL"]
+unfixable = []
+ignore = ["ISC001", "E203"]
+dummy-variable-rgx = "^(_+|(_+[a-zA-Z0-9_]*[a-zA-Z0-9]+?))$"
 
-[tool.flake8]
-max-line-length = 100
-extend-ignore = ["E203", "W503"]
-exclude = [".venv", ".git", "__pycache__"]
+[tool.ruff.lint.per-file-ignores]
+"tests/**/*.py" = ["S101"]
+"**/__init__.py" = ["D104"]
+
+[tool.ruff.lint.pydocstyle]
+convention = "numpy"
+
+[tool.ruff.lint.isort]
+combine-as-imports = true
+force-sort-within-sections = true
+case-sensitive = true
+lines-after-imports = 2
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+line-ending = "auto"
+skip-magic-trailing-comma = false
+docstring-code-format = true
+
+[tool.pdm.build]
+includes = ["aoc"]
 
 [build-system]
-requires = ["poetry-core"]
-build-backend = "poetry.core.masonry.api"
+requires = ["pdm-backend"]
+build-backend = "pdm.backend"
 
 [tool.pytest.ini_options]
 pythonpath = ["."]
 addopts = "-v"
 testpaths = ["tests"]
+asyncio_mode = "auto"
+markers = ["asyncio: mark test as async"]
+
+[tool.mypy]
+python_version = "3.11"
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = true
+disallow_incomplete_defs = true
+check_untyped_defs = true
+disallow_untyped_decorators = true
+no_implicit_optional = true
+strict_optional = true
+
+[[tool.mypy.overrides]]
+module = [
+    "numpy.*",
+    "pandas.*"
+]
+ignore_missing_imports = true

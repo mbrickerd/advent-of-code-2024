@@ -1,59 +1,56 @@
-from typing import List, Tuple
+"""Day 5: Print Queue.
+
+This module provides the solution for Advent of Code 2024 - Day 5.
+It processes print job ordering challenges according to specific sequencing rules.
+
+The solution validates print orders against rules specifying which pages must be
+printed before others, calculates middle pages of valid orders (Part 1), and
+fixes invalid orders before calculating their middle pages (Part 2).
+"""
 
 from aoc.models.base import SolutionBase
 
 
 class Solution(SolutionBase):
-    """Solution for Advent of Code 2024 - Day 5: Print Queue.
+    """Print job ordering with sequencing rules.
 
-    This class solves a puzzle involving print job ordering with specific sequencing rules.
-    Part 1 sums middle pages from valid print orders, while Part 2 fixes invalid orders
-    and sums their middle pages. Rules specify which pages must be printed before others.
+    This solution implements print queue validation and correction algorithms:
+    - Part 1: Find valid print orders and sum their middle pages
+    - Part 2: Fix invalid print orders and sum their middle pages
 
     Input format:
         - Rules section: Lines of "page1|page2" meaning `page1` must print before `page2`
         - Orders section: Lines of comma-separated page numbers representing print orders
-
-    This class inherits from `SolutionBase` and provides methods to validate and fix
-    print job orderings according to sequencing rules.
     """
 
-    def parse_data(self, data: List[str]) -> Tuple[List[Tuple[int, int]], List[List[int]]]:
+    def parse_data(self, data: list[str]) -> tuple[list[tuple[int, int]], list[list[int]]]:
         """Parse input into rules and print orders.
 
         Args:
-            data (List[str]): Raw input lines containing rules section followed by
+            data (list[str]): Raw input lines containing rules section followed by
                 orders section, separated by blank line.
 
-        Returns:
-            Tuple containing:
-                - List[Tuple[int, int]]: Pairs of (before, after) page numbers from rules
-                - List[List[int]]: Lists of page numbers representing print orders
-
-                Example:
-                For input:
-                    "1|2"
-                    "2|3"
-
-                    "1,2,3"
-                    "3,1,2"
-                Returns: ([(1,2), (2,3)], [[1,2,3], [3,1,2]])
+        Returns
+        -------
+            tuple containing:
+                - list[tuple[int, int]]: Pairs of (before, after) page numbers from rules
+                - list[list[int]]: Lists of page numbers representing print orders
         """
-        rules, ordering = [part.splitlines() for part in "\n".join(data).split("\n\n")]
-        rules = [(int(a), int(b)) for a, b in (rule.split("|") for rule in rules)]
-        ordering = [[int(x) for x in line.split(",")] for line in ordering]
-
+        parts = "\n".join(data).split("\n\n")
+        rules = [(int(a), int(b)) for rule in parts[0].splitlines() for a, b in [rule.split("|")]]
+        ordering = [[int(x) for x in line.split(",")] for line in parts[1].splitlines()]
         return rules, ordering
 
-    def is_valid_order(self, pages: List[int], rules: List[Tuple[int, int]]) -> bool:
+    def is_valid_order(self, pages: list[int], rules: list[tuple[int, int]]) -> bool:
         """Check if a print order satisfies all sequencing rules.
 
         Args:
-            pages (List[int]): List of page numbers in their print order
-            rules (List[Tuple[int, int]]): List of (before, after) pairs specifying
+            pages (list[int]): List of page numbers in their print order
+            rules (list[tuple[int, int]]): List of (before, after) pairs specifying
                 required ordering
 
-        Returns:
+        Returns
+        -------
             bool: `True` if all rules are satisfied (each 'before' page appears before its
                 corresponding 'after' page), `False` otherwise. For example:
                 - pages=[1,2,3], rules=[(1,2), (2,3)] returns True
@@ -61,43 +58,46 @@ class Solution(SolutionBase):
         """
         position = {num: i for i, num in enumerate(pages)}
         return all(
-            position[before] < position[after]
+            position.get(before, float("inf")) < position.get(after, float("-inf"))
             for before, after in rules
             if before in position and after in position
         )
 
-    def fix_order(self, pages: List[int], rules: List[tuple]) -> List[int]:
+    def fix_order(self, pages: list[int], rules: list[tuple[int, int]]) -> list[int]:
         """Fix an invalid print order by swapping pages until all rules are satisfied.
 
         Args:
-            pages (List[int]): List of page numbers in their current order
-            rules (List[tuple]): List of (before, after) pairs specifying required ordering
+            pages (list[int]): List of page numbers in their current order
+            rules (list[tuple]): List of (before, after) pairs specifying required ordering
 
-        Returns:
-            List[int]: New list with pages reordered to satisfy all rules. For example:
+        Returns
+        -------
+            list[int]: New list with pages reordered to satisfy all rules. For example:
                 - pages=[2,1,3], rules=[(1,2)] returns [1,2,3]
                 - pages=[3,1,2], rules=[(1,2), (2,3)] returns [1,2,3]
         """
-        pages = pages.copy()
+        result = pages.copy()
         changed = True
+
         while changed:
             changed = False
             for before, after in rules:
-                if before in pages and after in pages:
-                    i, j = pages.index(before), pages.index(after)
-                    if i > j:  # wrong order
-                        pages[j], pages[i] = pages[i], pages[j]
+                if before in result and after in result:
+                    i, j = result.index(before), result.index(after)
+                    if i > j:
+                        result[j], result[i] = result[i], result[j]
                         changed = True
 
-        return pages
+        return result
 
-    def part1(self, data: List[str]) -> int:
+    def part1(self, data: list[str]) -> int:
         """Sum middle pages from valid print orders.
 
         Args:
-            data (List[str]): Raw input containing rules and print orders.
+            data (list[str]): Raw input containing rules and print orders.
 
-        Returns:
+        Returns
+        -------
             int: Sum of middle page numbers from all valid print orders
                 (orders that already satisfy all rules).
         """
@@ -106,13 +106,14 @@ class Solution(SolutionBase):
             pages[len(pages) // 2] for pages in ordering if self.is_valid_order(pages, rules)
         )
 
-    def part2(self, data: List[str]) -> int:
+    def part2(self, data: list[str]) -> int:
         """Sum middle pages from fixed invalid print orders.
 
         Args:
-            data (List[str]): Raw input containing rules and print orders.
+            data (list[str]): Raw input containing rules and print orders.
 
-        Returns:
+        Returns
+        -------
             int: Sum of middle page numbers from all fixed invalid orders
                 (only considering orders that initially violated rules).
         """

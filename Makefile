@@ -1,36 +1,55 @@
+.PHONY: help install lint lint-fix format check test type-check all setup-pre-commit fix-all
+
 .DEFAULT: help
 
 help:
 	@echo "make install"
-	@echo "       install all dependencies specified in pyproject.toml"
+	@echo "       install all dependencies specified in pyproject.toml using uv"
+	@echo "make setup-pre-commit"
+	@echo "       set up pre-commit hooks"
 	@echo "make lint"
-	@echo "       run flake8 checks"
+	@echo "       run ruff linting checks"
+	@echo "make lint-fix"
+	@echo "       run ruff linting checks and fix auto-fixable issues"
 	@echo "make format"
-	@echo "       run isort and black to format code"
+	@echo "       run ruff format to format code and organize imports"
+	@echo "make type-check"
+	@echo "       run mypy for type checking"
 	@echo "make check"
-	@echo "       run all code quality checks (format + lint)"
+	@echo "       run all code quality checks (format + lint + type-check)"
+	@echo "make fix-all"
+	@echo "       run all auto-fixes (format + lint-fix)"
 	@echo "make test"
 	@echo "       run pytest"
 	@echo "make all"
-	@echo "       run format, lint, and test"
+	@echo "       run format, lint, type-check, and test"
 	@echo "make help"
 	@echo "       print this help message"
 
 install:
-	poetry install
+	uv pip install -e ".[dependency-groups.dev]"
+	$(MAKE) setup-pre-commit
+
+setup-pre-commit:
+	pre-commit install
 
 lint:
-	poetry run flake8 .
+	ruff check .
+
+lint-fix:
+	ruff check --fix .
 
 format:
-	poetry run isort .
-	poetry run black .
+	ruff format .
 
-check: format lint
+type-check:
+	mypy .
+
+check: format lint type-check
+
+fix-all: format lint-fix
 
 test:
-	poetry run pytest tests/
+	pytest tests/
 
-all: format lint test
-
-.PHONY: help install lint format check test all
+all: format lint type-check test

@@ -1,4 +1,14 @@
-from typing import List, Tuple
+"""Day 7: Bridge Repair.
+
+This module provides the solution for Advent of Code 2024 - Day 7.
+It handles processing numerical equations for bridge repair calculations.
+
+The module contains a Solution class that inherits from SolutionBase and implements
+methods to evaluate equation combinations using different allowed operations to
+reach target totals.
+"""
+
+from collections.abc import Callable
 
 from aoc.models.base import SolutionBase
 
@@ -6,110 +16,123 @@ from aoc.models.base import SolutionBase
 class Solution(SolutionBase):
     """Solution for Advent of Code 2024 - Day 7: Bridge Repair.
 
-    This class solves a puzzle involving numerical equations for bridge repair calculations.
-    Part 1 finds valid equations using addition and multiplication, while Part 2 adds
-    digit concatenation as a valid operation. Each equation must evaluate to a target total
-    using all values in order.
-
-    Input format:
-        Lines of "total: num1 num2 num3..." where `total` is the target sum and the numbers
-        must be combined in order using allowed operations to reach that total.
-
-    This class inherits from `SolutionBase` and provides methods to parse and evaluate
-    possible equation combinations.
+    Solves puzzles involving mathematical operations:
+    - Part 1: Find valid equations using addition and multiplication
+    - Part 2: Find valid equations using addition, multiplication, and digit concatenation
     """
 
-    def parse_data(self, data: List[str]) -> List[Tuple[int, List[int]]]:
+    def parse_data(self, data: list[str]) -> list[tuple[int, list[int]]]:
         """Parse input strings into equations with targets and values.
 
         Args:
-            data (List[str]): Input lines in format "total: num1 num2 num3..."
+            data: Input lines in format "total: num1 num2 num3..."
 
-        Returns:
-            List[Tuple[int, List[int]]]: List of tuples containing:
-                - Target total (int)
-                - List of numbers to combine
+        Returns
+        -------
+            List of tuples containing (target_total, list_of_values)
 
-                Example:
-                For input "10: 2 3 4" returns [(10, [2, 3, 4])]
+        Example:
+            For input "10: 2 3 4" returns [(10, [2, 3, 4])]
         """
-        equations = []
+        result = []
         for line in data:
-            total, values = line.split(":")
-            equations.append((int(total), [*map(int, values.strip().split())]))
+            if ":" not in line:
+                continue
 
-        return equations
+            total, values = line.split(":", 1)
+            try:
+                target = int(total)
+                nums = [int(v) for v in values.strip().split()]
+                result.append((target, nums))
 
-    def part1(self, data: List[str]) -> int:
-        """Sum totals of valid equations using addition and multiplication.
+            except ValueError:
+                continue
 
-        For each equation, tries all possible combinations of addition and
-        multiplication operations between numbers in order. Counts equations
-        where some combination reaches the target total.
+        return result
+
+    def solve_part(
+        self,
+        data: list[str],
+        ops: list[Callable[[int, int], int]],
+        *,
+        check_limit: bool | None = None,
+    ) -> int:
+        """Solve the puzzle part using specified operations.
+
+        For each equation, tries all possible combinations of operations between
+        numbers in sequential order. Counts equations where some combination
+        reaches the target total.
 
         Args:
-            data (List[str]): Input lines containing equations
+            data: Input equations in string format
+            ops: List of operations to apply between sequential numbers
+            check_limit: Whether to limit results to not exceed target value
 
-        Returns:
-            int: Sum of target totals from valid equations. For example:
-                - "10: 2 3 4" is valid (2*3+4=10)
-                - "12: 2 3 4" is valid (2*3*4=24)
-                - "7: 2 3 4" is invalid (no combination equals 7)
+        Returns
+        -------
+            Sum of target totals from valid equations
+
+        Example:
+            With addition and multiplication ops:
+            - "10: 2 3 4" is valid (2*3+4=10)
+            - "7: 2 3 4" is invalid (no combination equals 7)
         """
-        equations = self.parse_data(data)
-        result = []
+        valid_sum = 0
+        check_limit = bool(check_limit) if check_limit is not None else False
 
-        for total, values in equations:
-            possibles = [values.pop(0)]
-            while values:
-                current = values.pop(0)
-                tmp = []
-                for p in possibles:
-                    tmp.append(p + current)  # Addition
-                    tmp.append(p * current)  # Multiplication
+        for target, nums in self.parse_data(data):
+            if not nums:
+                continue
 
-                possibles = tmp
+            results = {nums[0]}
 
-            if total in possibles:
-                result.append(total)
+            for num in nums[1:]:
+                new_results = set()
+                for prev in results:
+                    for op in ops:
+                        result = op(prev, num)
+                        if not check_limit or result <= target:
+                            new_results.add(result)
 
-        return sum(result)
+                results = new_results
 
-    def part2(self, data: List[str]) -> int:
+            if target in results:
+                valid_sum += target
+
+        return valid_sum
+
+    def part1(self, data: list[str]) -> int:
+        """Sum totals of valid equations using addition and multiplication.
+
+        Tries all possible combinations of addition and multiplication operations
+        between numbers in order. Counts equations where some combination reaches
+        the target total.
+
+        Args:
+            data: Input lines containing equations
+
+        Returns
+        -------
+            Sum of target totals from valid equations
+        """
+        return self.solve_part(data, [lambda x, y: x + y, lambda x, y: x * y])
+
+    def part2(self, data: list[str]) -> int:
         """Sum totals of valid equations with addition, multiplication, and concatenation.
 
         Similar to part1 but adds digit concatenation as a valid operation.
-        For example, 2 || 3 = 23 (where || represents concatenation).
+        For example, 2||3 = 23 (where || represents concatenation).
         Only counts results that don't exceed the target total.
 
         Args:
-            data (List[str]): Input lines containing equations
+            data: Input lines containing equations
 
-        Returns:
-            int: Sum of target totals from valid equations. For example:
-                - "23: 2 3" is valid (2||3=23)
-                - "8: 2 3 4" is valid (2+3+3=8)
-                - "234: 2 3 4" is valid (2||3||4=234)
+        Returns
+        -------
+            Sum of target totals from valid equations
         """
-        equations = self.parse_data(data)
-        result = []
-
-        for total, values in equations:
-            possibles = [values.pop(0)]
-            while values:
-                current = values.pop(0)
-                tmp = []
-                for p in possibles:
-                    next_values = [  # Addition, multiplication, and concatenation
-                        p + current,
-                        p * current,
-                        int(str(p) + str(current)),
-                    ]
-                    tmp.extend([v for v in next_values if v <= total])
-
-                possibles = tmp
-
-            if total in possibles:
-                result.append(total)
-
-        return sum(result)
+        return self.solve_part(
+            data,
+            [lambda x, y: x + y, lambda x, y: x * y, lambda x, y: int(f"{x}{y}")],
+            check_limit=True,
+        )

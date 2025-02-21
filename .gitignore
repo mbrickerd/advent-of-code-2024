@@ -1,6 +1,9 @@
 # Byte-compiled / optimized / DLL files
 __pycache__/
 .pytest_cache
+.pdm-build
+.mypy_cache
+.ruff_cache
 *.py[cod]
 *$py.class
 
@@ -13,3 +16,4 @@ aoc_headers.json
 aoc_session
 
 *.DS_Store
+*uv.lock

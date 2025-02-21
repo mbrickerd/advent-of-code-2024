@@ -1,3 +1,11 @@
+"""Day 25: Code Chronicle.
+
+This module provides the solution for Advent of Code 2024 - Day 25.
+It handles analyzing lock and key combinations to determine valid pairings.
+
+The solution implements methods to check lock-key compatibility
+based on height profiles of their pattern grids.
+"""
 
 from aoc.models.base import SolutionBase
 
@@ -16,9 +24,6 @@ class Solution(SolutionBase):
         - Locks have 5 '#' symbols in their first row
         - Keys have a different number of '#' symbols in their first row
         - Each pattern consists of '#' and other symbols arranged in a grid
-
-    The challenge involves analyzing the height profiles of locks and keys
-    to determine which combinations will successfully open.
     """
 
     def part1(self, data: list[str]) -> int:
@@ -40,23 +45,20 @@ class Solution(SolutionBase):
         -------
             Integer count of valid lock-key combinations that will successfully open
         """
-        data = "\n".join(data).split("\n\n")
-        locks = []
-        keys = []
+        patterns = "\n".join(data).split("\n\n")
+        locks, keys = [], []
 
-        for item in data:
-            item = item.split("\n")
-            cols = [[row[c] for row in item] for c in range(len(item[0]))]
-            heights = [col.count("#") - 1 for col in cols]
+        for pattern in patterns:
+            item = pattern.split("\n")
+            heights = [col.count("#") - 1 for col in zip(*item, strict=False)]
 
             if item[0].count("#") == 5:
                 locks.append(heights)
             else:
                 keys.append(heights)
 
-        count = sum(
-            all(c <= 5 for c in [a + b for a, b in zip(lock, key, strict=False)])
+        return sum(
+            all(a + b <= 5 for a, b in zip(lock, key, strict=True))
             for lock in locks
             for key in keys
         )
-        return count

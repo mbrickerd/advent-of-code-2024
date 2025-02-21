@@ -1,5 +1,16 @@
+"""Day 17: Chronospatial Computer.
+
+This module provides the solution for Advent of Code 2024 - Day 17.
+It simulates a 3-bit computer with three registers (A, B, C) and eight instructions.
+The solution executes programs with specific register values and finds optimal
+initial values that make the program output itself.
+
+The computer simulates a virtual machine with operations including arithmetic,
+bitwise operations, jumps, and output generation, with 3-bit instructions (0-7).
+"""
+
 import re
-from typing import List, Tuple
+from re import Match
 
 from aoc.models.base import SolutionBase
 
@@ -12,7 +23,8 @@ class ThreeBitComputer:
     literal and combo operands. Instructions include arithmetic operations, bitwise
     operations, jumps, and output generation.
 
-    Attributes:
+    Attributes
+    ----------
         registers (dict): Dictionary storing values for registers A, B, and C
         instruction_pointer (int): Current position in the program
         output (list): List storing output values generated during program execution
@@ -28,7 +40,7 @@ class ThreeBitComputer:
         """
         self.registers = {"A": a, "B": b, "C": c}
         self.instruction_pointer = 0
-        self.output = []
+        self.output: list[int] = []
 
     def get_combo_value(self, operand: int) -> int:
         """Resolve the value of a combo operand based on its code.
@@ -40,28 +52,30 @@ class ThreeBitComputer:
                 5: Return value in register B
                 6: Return value in register C
 
-        Returns:
+        Returns
+        -------
             int: The resolved value of the combo operand
 
-        Raises:
+        Raises
+        ------
             ValueError: If the operand is invalid (7 or out of range)
         """
         if 0 <= operand <= 3:
             return operand
 
-        elif operand == 4:
+        if operand == 4:
             return self.registers["A"]
 
-        elif operand == 5:
+        if operand == 5:
             return self.registers["B"]
 
-        elif operand == 6:
+        if operand == 6:
             return self.registers["C"]
 
-        else:
-            raise ValueError(f"Invalid combo operand: {operand}")
+        error_message = f"Invalid combo operand: {operand}"
+        raise ValueError(error_message)
 
-    def execute_instruction(self, program: List[int]) -> bool:
+    def execute_instruction(self, program: list[int]) -> bool:
         """Execute the next instruction in the program.
 
         Executes the instruction at the current instruction_pointer position.
@@ -78,7 +92,8 @@ class ThreeBitComputer:
         Args:
             program (List[int]): List of integers representing the program instructions
 
-        Returns:
+        Returns
+        -------
             bool: False if program should halt, True if execution should continue
         """
         if self.instruction_pointer >= len(program):
@@ -116,13 +131,14 @@ class ThreeBitComputer:
         self.instruction_pointer += 2
         return True
 
-    def run(self, program: List[int]) -> List[int]:
+    def run(self, program: list[int]) -> list[int]:
         """Run the entire program until completion.
 
         Args:
             program (List[int]): List of integers representing the program instructions
 
-        Returns:
+        Returns
+        -------
             List[int]: List of output values generated during execution
         """
         self.output = []  # Reset output before running
@@ -131,7 +147,7 @@ class ThreeBitComputer:
 
         return self.output
 
-    def check_output(self, program: List[int], partial: bool = False) -> bool:
+    def check_output(self, program: list[int], *, partial: bool = False) -> bool:
         """Check if the program's output matches its own instructions.
 
         Args:
@@ -139,7 +155,8 @@ class ThreeBitComputer:
             partial (bool, optional): If True, allow checking partial output matches.
                 Defaults to False.
 
-        Returns:
+        Returns
+        -------
             bool: True if program output exactly matches the input program
                 (or matches partially if partial=True), False otherwise
         """
@@ -170,42 +187,50 @@ class Solution(SolutionBase):
     execute programs, and analyze program behavior.
     """
 
-    def parse_data(self, data: List[str]) -> Tuple[int, int, int, List[int]]:
+    def parse_data(self, data: list[str]) -> tuple[int, int, int, list[int]]:
         """Parse input data to extract register values and program instructions.
 
         Args:
             data (List[str]): Input lines containing register values and program
 
-        Returns:
+        Returns
+        -------
             Tuple containing:
                 - int: Initial value for register A
                 - int: Initial value for register B
                 - int: Initial value for register C
                 - List[int]: List of program instructions
         """
-        reg_a = int(re.search(r"Register A: (\d+)", data[0]).group(1))
-        reg_b = int(re.search(r"Register B: (\d+)", data[1]).group(1))
-        reg_c = int(re.search(r"Register C: (\d+)", data[2]).group(1))
+        # Handle potential None values from regex searches
+        reg_a_match: Match[str] | None = re.search(r"Register A: (\d+)", data[0])
+        reg_a = int(reg_a_match.group(1)) if reg_a_match else 0
+
+        reg_b_match: Match[str] | None = re.search(r"Register B: (\d+)", data[1])
+        reg_b = int(reg_b_match.group(1)) if reg_b_match else 0
+
+        reg_c_match: Match[str] | None = re.search(r"Register C: (\d+)", data[2])
+        reg_c = int(reg_c_match.group(1)) if reg_c_match else 0
 
         program_line = next(line for line in data if line.startswith("Program:"))
         program = [int(x) for x in program_line.split(": ")[1].split(",")]
 
         return reg_a, reg_b, reg_c, program
 
-    def part1(self, data: List[str]) -> str:
+    def part1(self, data: list[str]) -> str:
         """Execute the program with given register values and return its output.
 
         Args:
             data (List[str]): Input lines containing register values and program
 
-        Returns:
+        Returns
+        -------
             str: Comma-separated string of values output by the program
         """
         reg_a, reg_b, reg_c, program = self.parse_data(data)
         computer = ThreeBitComputer(reg_a, reg_b, reg_c)
         return ",".join(map(str, computer.run(program)))
 
-    def part2(self, data: List[str]) -> int:
+    def part2(self, data: list[str]) -> int:
         """Find lowest positive value for register A that makes program output itself.
 
         Uses mathematical patterns based on powers of 8 to efficiently find the solution.
@@ -215,30 +240,36 @@ class Solution(SolutionBase):
         Args:
             data (List[str]): Input lines containing register values and program
 
-        Returns:
+        Returns
+        -------
             int: Lowest positive value for register A that causes program to output
                 a copy of its own instructions
 
-        Raises:
+        Raises
+        ------
             ValueError: If the program generates output longer than itself
         """
         _, reg_b, reg_c, program = self.parse_data(data)
-
-        # Calculate initial value based on program length and powers of 8
-        a = sum(7 * 8**i for i in range(len(program) - 1)) + 1
+        a: int = sum(7 * 8**i for i in range(len(program) - 1)) + 1
 
         while True:
             computer = ThreeBitComputer(a, reg_b, reg_c)
             output = computer.run(program)
 
             if len(output) > len(program):
-                raise ValueError("Output longer than program")
+                error_message = "Output longer than program"
+                raise ValueError(error_message)
 
             if output == program:
                 return a
 
-            # Find position of first mismatch and adjust A accordingly
+            found_mismatch = False
             for i in range(len(output) - 1, -1, -1):
                 if output[i] != program[i]:
-                    a += 8**i  # Adjust A by power of 8 at mismatch position
+                    a_adjusted: int = a + 8**i
+                    a = a_adjusted
+                    found_mismatch = True
                     break
+
+            if not found_mismatch:
+                a += 1

@@ -1,46 +1,51 @@
+"""Day 3: Mull It Over.
+
+This module provides the solution for Advent of Code 2024 - Day 3.
+It handles parsing and execution of multiplication and control flow instructions.
+
+The module contains a Solution class that inherits from SolutionBase and implements
+methods to process instructions in two different modes:
+1. Part 1: Simple multiplication of number pairs
+2. Part 2: Conditional multiplication based on control flow instructions
+"""
+
 import re
-from typing import List
 
 from aoc.models.base import SolutionBase
 
 
 class Solution(SolutionBase):
-    """Solution for Advent of Code 2024 - Day 3: Mull It Over.
+    """Process multiplication and control flow instructions.
 
-    This class solves a puzzle involving parsing and processing multiplication instructions
-    in a specific format. Part 1 processes simple multiplication instructions, while Part 2
-    adds control flow instructions that can enable or disable the multiplication operations.
+    This solution parses and executes instructions in a specific format:
+    - mul(x,y): Multiply two numbers x and y
+    - do(): Enable multiplication operations (Part 2 only)
+    - don't(): Disable multiplication operations (Part 2 only)
 
-    Instructions are in the format:
-        - mul(x,y): Multiply two numbers x and y
-        - do(): Enable multiplication operations (Part 2 only)
-        - don't(): Disable multiplication operations (Part 2 only)
-
-    This class inherits from `SolutionBase` and provides methods to parse and execute
-    these instructions from the input data.
+    Part 1 processes all multiplication instructions.
+    Part 2 only processes multiplications when they're enabled by control flow.
     """
 
-    def part1(self, data: List[str]) -> int:
+    MULTIPLY_PATTERN = re.compile(r"mul\((\d{1,3}),(\d{1,3})\)")
+    INSTRUCTION_PATTERN = re.compile(r"(mul\((\d{1,3}),(\d{1,3})\)|do\(\)|don't\(\))")
+
+    def part1(self, data: list[str]) -> int:
         """Calculate sum of all multiplication operations in the input.
 
         Parses all multiplication instructions in the format `mul(x,y)` where `x` and `y`
         are 1-3 digit numbers, and returns the sum of all these multiplications.
 
         Args:
-            data (List[str]): A list of strings containing multiplication instructions
-                (e.g., ["mul(2,3)", "mul(10,20)"] or ["mul(2,3)mul(4,5)"]).
+            data: A list of strings containing multiplication instructions.
 
-        Returns:
-            int: The sum of all multiplication results. For example:
-                - "mul(2,3)mul(4,5)" returns 26 (2*3 + 4*5)
-                - "mul(10,20)" returns 200 (10*20)
+        Returns
+        -------
+            The sum of all multiplication results.
         """
-        pattern = r"mul\((\d{1,3}),(\d{1,3})\)"
-        instructions = re.findall(pattern, "".join(data))
+        input_text = "".join(data)
+        return sum(int(x) * int(y) for x, y in self.MULTIPLY_PATTERN.findall(input_text))
 
-        return sum(int(x) * int(y) for x, y in instructions)
-
-    def part2(self, data: List[str]) -> int:
+    def part2(self, data: list[str]) -> int:
         """Calculate sum of enabled multiplication operations.
 
         Processes multiplication and control flow instructions:
@@ -52,30 +57,28 @@ class Solution(SolutionBase):
         are included in the final sum.
 
         Args:
-            data (List[str]): A list of strings containing multiplication and control
-                instructions (e.g., ["do()mul(2,3)don't()mul(4,5)"]).
+            data: A list of strings containing multiplication and control instructions.
 
-        Returns:
-            int: The sum of multiplication results that occurred while enabled.
-                For example:
-                - "do()mul(2,3)don't()mul(4,5)" returns 6 (only 2*3 is counted)
-                - "mul(2,3)do()mul(4,5)" returns 20 (only 4*5 is counted)
+        Returns
+        -------
+            The sum of multiplication results that occurred while enabled.
         """
-        pattern = r"(mul\((\d{1,3}),(\d{1,3})\)|do\(\)|don't\(\))"
-        instructions = re.findall(pattern, "".join(data))
+        input_text = "".join(data)
+        instructions = self.INSTRUCTION_PATTERN.findall(input_text)
 
         enabled = True
-        result = 0
+        total = 0
 
-        for step in instructions:
-            match step[0]:
-                case "do()":
-                    enabled = True
+        for instruction in instructions:
+            cmd = instruction[0]
 
-                case "don't()":
-                    enabled = False
+            if cmd == "do()":
+                enabled = True
 
-                case _ if enabled:
-                    result += int(step[1]) * int(step[2])
+            elif cmd == "don't()":
+                enabled = False
 
-        return result
+            elif enabled and cmd.startswith("mul"):
+                total += int(instruction[1]) * int(instruction[2])
+
+        return total
