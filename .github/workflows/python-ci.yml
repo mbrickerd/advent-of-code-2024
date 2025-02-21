@@ -33,14 +33,10 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-uv-
 
-      - name: Create virtual environment
-        run: uv venv
-
-      - name: Install project dependencies
-        run: uv pip install -e .
-
-      - name: Install dev tools
-        run: uv pip install ruff==0.3.4 mypy pytest types-requests types-beautifulsoup4 types-networkx
+      - name: Create virtual environment and install project with dev dependencies
+        run: |
+          uv venv
+          uv pip install -e ".[dev]"
 
       - name: Debug environment
         run: |
@@ -49,8 +45,6 @@ jobs:
           python --version
           echo "Installed packages:"
           pip list
-          echo "Virtual env bin directory contents:"
-          ls -la .venv/bin/
 
       - name: Check formatting
         run: |
@@ -94,14 +88,10 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-uv-
 
-      - name: Create virtual environment
-        run: uv venv
-
-      - name: Install project
-        run: uv pip install -e .
-
-      - name: Install pytest
-        run: uv pip install pytest
+      - name: Create virtual environment and install project with dev dependencies
+        run: |
+          uv venv
+          uv pip install -e ".[dev]"
 
       - name: Run tests
         run: |
