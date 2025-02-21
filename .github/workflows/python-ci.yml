@@ -44,17 +44,17 @@ jobs:
       - name: Check formatting
         run: |
           source .venv/bin/activate
-          ruff format --check .
+          .venv/bin/ruff format --check .
 
       - name: Run linting
         run: |
           source .venv/bin/activate
-          ruff check .
+          .venv/bin/ruff check .
 
       - name: Run type checking
         run: |
           source .venv/bin/activate
-          mypy .
+          .venv/bin/mypy .
 
   test:
     name: Tests
@@ -94,4 +94,4 @@ jobs:
       - name: Run tests
         run: |
           source .venv/bin/activate
-          pytest tests/
+          .venv/bin/pytest tests/
