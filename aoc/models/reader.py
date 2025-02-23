@@ -60,7 +60,7 @@ class Reader:
         -------
             The puzzle input as a string or list of strings
         """
-        file_path = cls.PROJECT_ROOT / "data" / f"day{day:02d}.txt"
+        file_path = cls.PROJECT_ROOT / "data" / f"day{day:02d}" / "puzzle_input.txt"
 
         with Path.open(file_path) as f:
             content = f.read()

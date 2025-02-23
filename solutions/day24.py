@@ -1,13 +1,287 @@
 """Day 24: Crossed Wires.
 
-This module provides the solution for Advent of Code 2024 - Day 24.
-It handles analyzing digital circuits and identifying wire connections.
+Analyze digital circuits and identify wire connections.
 
-The solution implements methods to simulate circuit execution and detect
-misconnected wires in a full adder implementation.
+This module solves a puzzle about examining circuit structures and connections,
+finding the output of wires, and identifying which wires need to be swapped.
 """
 
+from collections.abc import Callable
+from dataclasses import dataclass, field
+import re
+
 from aoc.models.base import SolutionBase
+
+
+@dataclass
+class Connection:
+    """Represents a logic gate connection in the circuit.
+
+    Args:
+        input1: First input wire identifier
+        gate: Gate operation type (AND, OR, XOR)
+        input2: Second input wire identifier
+        output: Output wire identifier
+
+    Returns
+    -------
+        Connection instance representing a single logic gate connection
+    """
+
+    input1: str
+    gate: str
+    input2: str
+    output: str
+
+    def __str__(self) -> str:
+        """Generate string representation of the connection.
+
+        Returns
+        -------
+            String in format 'input1 gate input2 -> output'
+        """
+        return f"{self.input1} {self.gate} {self.input2} -> {self.output}"
+
+
+@dataclass
+class Circuit:
+    """Represents a digital circuit with wires and logic gate connections.
+
+    Args:
+        wires: Dictionary mapping wire identifiers to their values
+        connections: List of Connection objects representing logic gates
+        operators: Dictionary mapping gate types to their logic functions
+
+    Returns
+    -------
+        Circuit instance representing the complete digital circuit
+    """
+
+    wires: dict[str, int]
+    connections: list[Connection] = field(default_factory=list)
+    operators: dict[str, Callable[[int, int], int]] = field(
+        default_factory=lambda: {
+            "OR": lambda x, y: x | y,
+            "AND": lambda x, y: x & y,
+            "XOR": lambda x, y: x ^ y,
+        }
+    )
+
+    def calc(self, wire: str) -> int:
+        """Calculate the value of a wire based on its inputs and gate operation.
+
+        Args:
+            wire: Identifier of the wire to calculate
+
+        Returns
+        -------
+            Computed value for the wire
+
+        Raises
+        ------
+            ValueError: If no connection is found for the wire
+        """
+        if self.wires[wire] != -1:
+            return self.wires[wire]
+
+        for conn in self.connections:
+            if conn.output == wire:
+                x = self.calc(conn.input1)
+                y = self.calc(conn.input2)
+                self.wires[wire] = self.operators[conn.gate](x, y)
+                return self.wires[wire]
+
+        error_message = f"No connection found for wire {wire}"
+        raise ValueError(error_message)
+
+    def execute(self) -> list[int]:
+        """Execute the circuit and return the z-wire values.
+
+        Returns
+        -------
+            List of z-wire values in reverse order
+        """
+        z_values = []
+        i = 0
+
+        while True:
+            key = f"z{i:02}"
+            if key not in self.wires or all(conn.output != key for conn in self.connections):
+                break
+
+            z_values.append(self.calc(key))
+            i += 1
+
+        return z_values[::-1]  # Reverse for correct order
+
+
+class CircuitValidator:
+    """Helper class for verifying circuit connections in part 2."""
+
+    def __init__(self, formulas: dict[str, tuple[str, str, str]]):
+        self.formulas = formulas
+
+    def make_wire(self, char: str, num: int) -> str:
+        """Create a wire ID with the given character and number.
+
+        Args:
+            char: Character prefix for the wire ('x', 'y', or 'z')
+            num: Wire number to append
+
+        Returns
+        -------
+            Wire identifier in format 'char##'
+        """
+        return f"{char}{num:02}"
+
+    def validate_z(self, wire: str, num: int) -> bool:
+        """Validate a z-wire in the circuit.
+
+        Args:
+            wire: Wire identifier to validate
+            num: Expected bit position for the wire
+
+        Returns
+        -------
+            True if wire is correctly connected, False otherwise
+        """
+        if wire not in self.formulas:
+            return False
+
+        op, x, y = self.formulas[wire]
+        if op != "XOR":
+            return False
+
+        if num == 0:
+            return sorted([x, y]) == ["x00", "y00"]
+
+        return (
+            self.validate_intermediate_xor(x, num)
+            and self.validate_carry_bit(y, num)
+            or self.validate_intermediate_xor(y, num)
+            and self.validate_carry_bit(x, num)
+        )
+
+    def validate_intermediate_xor(self, wire: str, num: int) -> bool:
+        """Validate an intermediate XOR gate in the circuit.
+
+        Args:
+            wire: Wire identifier to validate
+            num: Expected bit position for the wire
+
+        Returns
+        -------
+            True if gate is correctly configured, False otherwise
+        """
+        if wire not in self.formulas:
+            return False
+
+        op, x, y = self.formulas[wire]
+        if op != "XOR":
+            return False
+
+        return sorted([x, y]) == [self.make_wire("x", num), self.make_wire("y", num)]
+
+    def validate_carry_bit(self, wire: str, num: int) -> bool:
+        """Validate a carry bit in the circuit.
+
+        Args:
+            wire: Wire identifier to validate
+            num: Expected bit position for the wire
+
+        Returns
+        -------
+            True if carry bit is correctly configured, False otherwise
+        """
+        if wire not in self.formulas:
+            return False
+
+        op, x, y = self.formulas[wire]
+        if num == 1:
+            if op != "AND":
+                return False
+
+            return sorted([x, y]) == ["x00", "y00"]
+
+        if op != "OR":
+            return False
+
+        return (
+            self.validate_direct_carry(x, num - 1)
+            and self.validate_recarry(y, num - 1)
+            or self.validate_direct_carry(y, num - 1)
+            and self.validate_recarry(x, num - 1)
+        )
+
+    def validate_direct_carry(self, wire: str, num: int) -> bool:
+        """Validate a direct carry gate in the circuit.
+
+        Args:
+            wire: Wire identifier to validate
+            num: Expected bit position for the wire
+
+        Returns
+        -------
+            True if direct carry is correctly configured, False otherwise
+        """
+        if wire not in self.formulas:
+            return False
+
+        op, x, y = self.formulas[wire]
+        if op != "AND":
+            return False
+
+        return sorted([x, y]) == [self.make_wire("x", num), self.make_wire("y", num)]
+
+    def validate_recarry(self, wire: str, num: int) -> bool:
+        """Validate a recarry gate in the circuit.
+
+        Args:
+            wire: Wire identifier to validate
+            num: Expected bit position for the wire
+
+        Returns
+        -------
+            True if recarry is correctly configured, False otherwise
+        """
+        if wire not in self.formulas:
+            return False
+
+        op, x, y = self.formulas[wire]
+        if op != "AND":
+            return False
+
+        return (
+            self.validate_intermediate_xor(x, num)
+            and self.validate_carry_bit(y, num)
+            or self.validate_intermediate_xor(y, num)
+            and self.validate_carry_bit(x, num)
+        )
+
+    def validate(self, num: int) -> bool:
+        """Validate the circuit at a specific bit position.
+
+        Args:
+            num: Bit position to validate
+
+        Returns
+        -------
+            True if bit position is correctly configured, False otherwise
+        """
+        return self.validate_z(self.make_wire("z", num), num)
+
+    def progress(self) -> int:
+        """Determine how many bits are correctly validated in sequence.
+
+        Returns
+        -------
+            Number of consecutive valid bit positions from zero
+        """
+        i = 0
+        while self.validate(i):
+            i += 1
+
+        return i
 
 
 class Solution(SolutionBase):
@@ -25,235 +299,95 @@ class Solution(SolutionBase):
         - Wire IDs starting with 'x' and 'y' are inputs, those starting with 'z' are outputs
     """
 
-    def normalize_gate(self, wire_a: str, wire_b: str, operation: str) -> tuple[str, str, str]:
-        """Create a consistent gate representation by ordering input wires alphabetically.
+    def parse_data(self, data: list[str]) -> Circuit:
+        """Parse input data into a Circuit object.
 
         Args:
-            wire_a: First input wire ID
-            wire_b: Second input wire ID
-            operation: Logic gate operation (AND, OR, XOR)
+            data: List of strings containing initial wire values and gate connections
 
         Returns
         -------
-            Tuple of normalized wire names and operation
+            Circuit object with initialized wires and connections
         """
-        sorted_wires = sorted([wire_a, wire_b])
-        return (sorted_wires[0], sorted_wires[1], operation)
+        separator_idx = data.index("")
+        wires = {}
 
-    def find_output_wire(
-        self,
-        inverted_gates: dict[tuple[str, str, str], str],
-        wire_a: str,
-        wire_b: str,
-        operation: str,
-    ) -> str:
-        """Find the output wire for given input wires and operation.
-
-        Args:
-            inverted_gates: Mapping of (input1, input2, operation) to output wire
-            wire_a: First input wire ID
-            wire_b: Second input wire ID
-            operation: Logic gate operation (AND, OR, XOR)
-
-        Returns
-        -------
-            Output wire ID if exists, otherwise None
-        """
-        return inverted_gates.get(self.normalize_gate(wire_a, wire_b, operation), "")
-
-    def _process_gate(
-        self, wires: dict[str, int | None], input1: str, gate: str, input2: str, output: str
-    ) -> bool:
-        """Process a single gate operation if inputs are available.
-
-        Args:
-            wires: Dictionary of wire values
-            input1: First input wire ID
-            gate: Gate operation type
-            input2: Second input wire ID
-            output: Output wire ID
-
-        Returns
-        -------
-            True if gate was processed, False otherwise
-        """
-        if wires[input1] is not None and wires[input2] is not None:
-            if gate == "AND":
-                wires[output] = int(bool(wires[input1]) and bool(wires[input2]))
-            elif gate == "OR":
-                wires[output] = int(bool(wires[input1]) or bool(wires[input2]))
-            elif gate == "XOR":
-                wires[output] = int(wires[input1] != wires[input2])
-            return True
-        return False
-
-    def find_wire_chain(
-        self,
-        inverted_gates: dict[tuple[str, str, str], str],
-        bit_num: int,
-        carry: str | None,
-        swapped: list[str],
-    ) -> tuple[str, str]:
-        """Identify the full adder chain for a specific bit position.
-
-        Args:
-            inverted_gates: Mapping of gate connections
-            bit_num: Current bit position
-            carry: Carry-in wire from previous bit
-            swapped: List to track swapped wires
-
-        Returns
-        -------
-            Tuple of (sum wire, carry-out wire) or None
-        """
-        x_wire = f"x{bit_num:02}"
-        y_wire = f"y{bit_num:02}"
-
-        # Try both wire orderings for XOR and AND
-        xor_out = self.find_output_wire(
-            inverted_gates, x_wire, y_wire, "XOR"
-        ) or self.find_output_wire(inverted_gates, y_wire, x_wire, "XOR")
-        and_out = self.find_output_wire(
-            inverted_gates, x_wire, y_wire, "AND"
-        ) or self.find_output_wire(inverted_gates, y_wire, x_wire, "AND")
-
-        # Handle special cases for test data
-        if xor_out is None:
-            if and_out is None:
-                # Find z-wires for simple test cases
-                z_wires = sorted(w for w in inverted_gates.values() if w.startswith("z"))
-                if bit_num < len(z_wires):
-                    return z_wires[bit_num], z_wires[(bit_num + 1) % len(z_wires)]
-                return ""
-            return and_out, and_out
-
-        if carry == "":
-            return xor_out, and_out
-
-        # Complex wire chain resolution
-        carry_and = self.find_output_wire(
-            inverted_gates, str(carry), str(xor_out), "AND"
-        ) or self.find_output_wire(inverted_gates, str(xor_out), str(carry), "AND")
-
-        if not carry_and:
-            and_out, xor_out = xor_out, and_out
-            swapped.extend([xor_out, and_out])
-            carry_and = self.find_output_wire(
-                inverted_gates, str(carry), str(xor_out), "AND"
-            ) or self.find_output_wire(inverted_gates, str(xor_out), str(carry), "AND")
-
-        sum_out = self.find_output_wire(
-            inverted_gates, str(carry), str(xor_out), "XOR"
-        ) or self.find_output_wire(inverted_gates, str(xor_out), str(carry), "XOR")
-
-        # Adjust wire positions
-        for wire in [xor_out, and_out, carry_and]:
-            if wire and wire.startswith("z") and wire != sum_out:
-                swapped.extend([wire, sum_out])
-
-        # Determine next carry
-        next_carry_candidate = (
-            self.find_output_wire(inverted_gates, str(carry_and or and_out), str(and_out), "OR")
-            or self.find_output_wire(inverted_gates, str(and_out), str(carry_and or and_out), "OR")
-            or and_out
-        )
-
-        # Ensure we return a tuple of two non-None strings
-        next_carry = next_carry_candidate or and_out
-        return (sum_out or "", next_carry or "")
-
-    def part1(self, data: list[str]) -> int:
-        """Calculate the final output value of the digital circuit.
-
-        Args:
-            data: Input lines with wire values and gate connections
-
-        Returns
-        -------
-            Binary value represented by z-wires
-        """
-        # Split input into wire values and gate connections
-        pos = data.index("")
-        init_wire_values = data[:pos]
-        gate_connections = data[pos + 1 :]
-
-        # Initialize wire values
-        wires: dict[str, int | None] = {}
-        for line in gate_connections:
-            input1, gate, input2, _, output = line.split()
-            wires.update({input1: None, input2: None, output: None})
-
-        # Set initial wire values
-        for line in init_wire_values:
+        for line in data[:separator_idx]:
             wire, val = line.split(": ")
             wires[wire] = int(val)
 
-        # Process gates until all values are computed
-        while gate_connections:
-            done = []
-            for i, line in enumerate(gate_connections):
-                input1, gate, input2, _, output = line.split()
-                if self._process_gate(wires, input1, gate, input2, output):
-                    done.append(i)
+        connections = []
+        for line in data[separator_idx + 1 :]:
+            match = re.match(r"(\w+) (OR|AND|XOR) (\w+) -> (\w+)", line)
+            if match:
+                input1, gate, input2, output = match.groups()
 
-            gate_connections = [v for i, v in enumerate(gate_connections) if i not in done]
+                for wire in [input1, input2, output]:
+                    if wire not in wires:
+                        wires[wire] = -1
 
-        # Collect and convert z-wire values to binary
-        z_wires = [
-            v
-            for k, v in sorted(
-                [val for val in wires.items() if val[0].startswith("z")],
-                key=lambda x: x[0],
-                reverse=True,
-            )
-        ]
-        return int("".join(map(str, z_wires)), 2)
+                connections.append(Connection(input1, gate, input2, output))
 
-    def part2(self, data: list[str]) -> str:
-        """Identify and list misconnected wires in the circuit.
+        return Circuit(wires, connections)
+
+    def part1(self, data: list[str]) -> int:
+        """Simulate the digital circuit to calculate the final output value.
+
+        Parses the input to extract initial wire values and gate connections,
+        then simulates the execution of the circuit by processing gates in order
+        until all wire values are computed. Returns the binary value represented
+        by the z-wires.
 
         Args:
-            data: Input lines with gate connections
+            data: List of strings containing initial wire values and gate connections
 
         Returns
         -------
-            Comma-separated string of z-wire IDs to swap
+            Integer value represented by the binary output of z-wires
         """
-        # Split gate connections
-        pos = data.index("")
-        gate_connections = data[pos + 1 :]
+        circuit = self.parse_data(data)
+        z_values = circuit.execute()
+        return int("".join(map(str, z_values)), 2)
 
-        # Build gate relations and inverse lookup
-        gate_relation: dict[str, tuple[str, str, str]] = {}
-        for line in gate_connections:
-            input1, gate, input2, _, output = line.split()
-            gate_relation[output] = self.normalize_gate(input1, input2, gate)
+    def part2(self, data: list[str]) -> str:
+        """Identify misconnected wires in the full adder circuit.
 
-        inverted_gates = {v: k for k, v in gate_relation.items()}
+        Analyzes the circuit structure to find z-wires that need to be swapped
+        to correctly implement a full adder.
 
-        # Special case for test input with only AND gates
-        if all(gate[2] == "AND" for gate in inverted_gates):
-            return "z00,z01,z02,z05"
+        Args:
+            data: List of strings containing gate connections
 
-        # Process wire chain
-        carry: str | None = None
-        swapped: list[str] = []
-        input_size = len([w for w in gate_relation if w.startswith("z")]) - 2
+        Returns
+        -------
+            Comma-separated string of z-wire IDs that need to be swapped,
+            sorted alphabetically
+        """
+        formulas = {}
+        separator_idx = data.index("")
 
-        for bit in range(input_size):
-            result = self.find_wire_chain(inverted_gates, bit, carry, swapped)
-            if result is None:
-                continue
+        for line in data[separator_idx + 1 :]:
+            match = re.match(r"(\w+) (OR|AND|XOR) (\w+) -> (\w+)", line)
+            if match:
+                input1, gate, input2, output = match.groups()
+                formulas[output] = (gate, input1, input2)
 
-            sum_bit, next_carry = result
+        validator = CircuitValidator(formulas)
+        swaps = []
 
-            # Fix carry chain
-            if next_carry and next_carry.startswith("z") and next_carry != f"z{input_size+1:02}":
-                swapped.extend([next_carry, sum_bit])
-                next_carry, sum_bit = sum_bit, next_carry
+        for _ in range(4):
+            baseline = validator.progress()
+            for x in formulas:
+                for y in formulas:
+                    if x == y:
+                        continue
+                    formulas[x], formulas[y] = formulas[y], formulas[x]
+                    if validator.progress() > baseline:
+                        break
+                    formulas[x], formulas[y] = formulas[y], formulas[x]
+                else:
+                    continue
+                break
+            swaps += [x, y]
 
-            carry = next_carry or self.find_output_wire(
-                inverted_gates, f"x{bit:02}", f"y{bit:02}", "AND"
-            )
-
-        return ",".join(sorted(swapped[:8]))
+        return ",".join(sorted(swaps))
