@@ -6,101 +6,48 @@ Advent of Code is an Advent calendar of small programming puzzles for a variety 
 
 #### Clone the Repository:
 
-```
+```bash
 https://github.com/mbrickerd/advent-of-code-2024
 ```
 
 #### Install Dependencies:
 
-Poetry is a tool for dependency management and packaging in Python. It allows you to declare the libraries your project depends on and it will manage (install/update) them for you. Poetry offers a lockfile to ensure repeatable installs, and can build your project for distribution.
+This project uses `uv` for dependency management and `pre-commit` for maintaining code quality. Follow these steps to set up your development environment:
 
-For more information on how to install Poetry on your operating system, click [here](https://python-poetry.org/docs/#installation).
+1. First, install `uv`:
 
-Once you have Poetry installed, run the following command from the root directory of this project:
+   **On Unix-like systems (Linux, macOS):**
+   ```bash
+   curl -LsSf https://astral.sh/uv/install.sh | sh
+   ```
 
-```bash
-poetry install
-```
+   **On Windows:**
+   ```powershell
+   powershell -c "irm https://astral.sh/uv/install.ps1 | iex"
+   ```
 
-This command will also create a `.venv` virtual environment within your local project structure. Be sure to activate your newly created virtual environment before beginning with development with the appropriate command:
+   For more installation options, visit [uv's installation guide](https://github.com/astral-sh/uv).
 
+2. Install project dependencies:
 
-| Platform | Shell       | Command to activate virtual environment          |
-|----------|-------------|--------------------------------------------------|
-| POSIX    | bash/zsh    | `$ source <venv>/bin/activate`                   |
-|          | fish        | `$ source <venv>/bin/activate.fish`              |
-|          | csh/tcsh    | `$ source <venv>/bin/activate.csh`               |
-|          | PowerShell  | `$ <venv>/bin/Activate.ps1`                      |
-| Windows  | cmd.exe     | `C:\> <venv>\Scripts\activate.bat`               |
-|          | PowerShell  | `PS C:\> <venv>\Scripts\Activate.ps1`            |
+   ```bash
+   make install
+   ```
 
+   This command will:
+   - Install all project dependencies using `uv`
+   - Set up pre-commit hooks for code quality
 
-If you need to add additional packages or libraries as you develop, run the following command to update the `pyproject.toml`:
+3. Individual development tools can be managed using make commands:
 
-```
-poetry add <package_name>
-```
-
-## Advent of Code configuration
-
-To interact directly with the Advent of Code platform (e.g., for downloading inputs or submitting answers), this framework requires two configuration files: `aoc_headers.json` and `aoc_session`. These files store essential metadata and session information necessary for authenticated requests.
-
-#### `aoc_headers.json`
-
-This file contains HTTP headers used for all requests made to the Advent of Code platform. The most important header is the User-Agent, which helps identify your automated requests to the Advent of Code servers.
-
-The User-Agent should follow this format:
-- Project name and version
-- URL to your project/GitHub repository (optional)
-- Your contact information (email or GitHub username)
-
-Example content:
-
-```json
-{
-    "User-Agent": "AdventOfCodeHelper/1.0 (contact@example.com)"
-}
-```
-
-OR
-
-```json
-{
-    "User-Agent": "AdventOfCodeHelper/1.0 (+https://example.com; contact@example.com)"
-}
-```
-
-This ensures requests conform to the platform's API requirements and helps identify your script to the Advent of Code servers.
-
-#### `aoc_session`
-
-This file stores the session token obtained from the Advent of Code website after logging into your account. It is required for authentication and allows access to personalized inputs and submission capabilities.
-
-To obtain your session token:
-
-1. Log into [Advent of Code](https://adventofcode.com)
-
-2. Open your browser's Developer Tools:
-   - Chrome/Edge: Press F12 or Ctrl+Shift+I
-   - Firefox: Press F12 or Ctrl+Shift+I
-   - Safari: Enable 'Show Develop menu in menu bar' in Preferences > Advanced, then press Cmd+Option+I
-
-3. Navigate to:
-   - Chrome/Edge: Application > Cookies > https://adventofcode.com
-   - Firefox: Storage > Cookies
-   - Safari: Storage > Cookies
-
-4. Find the cookie named "session"
-
-5. Copy its value into the `aoc_session` file
-
-Example content:
-
-```plaintext
-abc123yourlongsessiontokenhere
-```
-
-This file provides authentication for downloading your unique puzzle inputs and submitting solutions under your account.
+   ```bash
+   make help              # Show all available commands
+   make lint              # Run ruff linting checks
+   make format            # Format code and organize imports
+   make type-check        # Run mypy type checking
+   make test              # Run pytest
+   make all               # Run format, lint, type-check, and test
+   ```
 
 ## Project structure
 
@@ -115,31 +62,34 @@ This repository is a modular and efficient framework designed to manage and solv
 │   ├── __init__.py
 │   ├── models
 │   │   ├── __init__.py
-│   │   ├── base.py         # Base class definitions for shared functionality
-│   │   ├── file.py         # Handles file operations (e.g., input files, test files)
-│   │   ├── reader.py       # Reads and parses input data for the solution
-│   │   ├── submission.py   # Logic for submitting answers to AoC
-│   │   └── tester.py       # Utilities for testing solutions
+│   │   ├── authenticator.py   # Manages Advent of Code authentication credentials
+│   │   ├── base.py            # Base class definitions for shared functionality
+│   │   ├── file.py            # Handles file operations (e.g., input files, test files)
+│   │   ├── reader.py          # Reads and parses input data for the solution
+│   │   ├── submission.py      # Logic for submitting answers to AoC
+│   │   └── tester.py          # Utilities for testing solutions
 │   └── utils
 │       ├── __init__.py
-│       └── initialise.py   # Utilities for initializing daily solution files
+│       └── initialise.py      # Utilities for initializing daily solution files
 ├── solutions
-│   ├── day01.py            # Example solution for Day 1
-│   └── day02.py            # Example solution for Day 2
+│   ├── day01.py               # Example solution for Day 1
+│   ├── day02.py               # Example solution for Day 2
+│   └── ...
 ├── templates
 │   ├── solutions
-│   │   └── sample.py       # Template for new daily solution files
+│   │   └── sample.py          # Template for new daily solution files
 │   └── tests
-│       └── sample.txt      # Template for test cases
+│       └── sample.txt         # Template for test cases
 ├── tests
 │   ├── __init__.py
-│   ├── test_01.py          # Tests for Day 1 solutions
-│   └── test_02.py          # Tests for Day 2 solutions
+│   ├── test_01.py             # Tests for Day 1 solutions
+│   ├── test_02.py             # Tests for Day 2 solutions
+│   └── ...
 ├── .gitignore
-├── main.py                 # Main script to manage tasks and run solutions
-├── Makefile
-├── poetry.lock
-├── pyproject.toml
+├── .pre-commit-config.yaml    # Pre-commit hooks configuration
+├── main.py                    # Main script to manage tasks and run solutions
+├── Makefile                   # Development workflow automation
+├── pyproject.toml             # Project dependencies and configuration
 └── README.md
 ```
 
@@ -154,7 +104,7 @@ This is the core package for the project. It includes:
 
 #### `solutions/`
 
-Contains the solution files for each day's challenge. Each file represents a self-contained solution where you implement logic for both parts of the day’s task.
+Contains the solution files for each day's challenge. Each file represents a self-contained solution where you implement logic for both parts of the day's task.
 
 #### `templates/`
 
@@ -178,9 +128,18 @@ The central script to perform various tasks such as:
 
 Provides convenient commands for common development tasks:
 - Installing dependencies
-- Running code quality checks (black, isort, flake8)
+- Setting up pre-commit hooks
+- Running code quality checks (ruff, mypy)
 - Executing tests
 - Formatting code
+
+#### `.pre-commit-config.yaml`
+
+Configures pre-commit hooks that run automatically before each commit to ensure code quality:
+- Code formatting
+- Import sorting
+- Linting
+- Type checking
 
 #### `.github/workflows/python-ci.yml`
 
